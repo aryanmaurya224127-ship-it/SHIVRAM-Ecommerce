@@ -1,0 +1,32 @@
+import FormalShoesStore from "../PagesItems/FormalShoesStorage.jsx";
+import MainLayout from "../Layout/MainLayout.jsx";
+
+import "../Style/item.css";
+
+function FormalShoes() {
+  return (
+    <MainLayout>
+      <section className="body-section py-5">
+        <div className="container">
+
+          
+            <div className="ItemContent">
+            <h2 className="fw-bold">Men's Formal Shoes Collection</h2>
+            <p className="text-muted">
+              Step into elegance with SHIVRAM's premium formal shoes.
+              Perfect for office wear, business meetings, weddings,
+              and every special occasion.
+            </p>
+          </div>
+
+          <div className="row g-4">
+            <FormalShoesStore />
+          </div>
+
+        </div>
+      </section>
+    </MainLayout>
+  );
+}
+
+export default FormalShoes;
