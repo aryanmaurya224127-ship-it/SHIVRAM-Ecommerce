@@ -9,6 +9,8 @@ import CasualShoes from "../Pages/CasualShoes.jsx";
 import FormalShoes from "../Pages/FormalShoes.jsx";
 import BuyButton from "../Pages/BuyButton.jsx";
 import Login from '../Pages/Login.jsx'
+import Cart from '../Pages/Cart.jsx'
+import ProductDetail from "../Pages/ProductDetail.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import '../Style/App.css'
 
@@ -28,7 +30,10 @@ function Body() {
         <Route path="FormalShoes" element={<FormalShoes />} />
         <Route path="BuyButton" element={<BuyButton/>} />
         <Route path="/Login" element={<Login/>} />
+        <Route path="/Cart" element={<Cart/>} />
         
+        <Route path="/ProductDetail" element={<ProductDetail/>} />
+
       </Routes>
     </>
   )

@@ -34,6 +34,7 @@
 
 .product-card:hover img {
   transform: scale(1.05);
+  margin-bottom: 3px;
 }
 
 .rating{
@@ -70,16 +71,30 @@
 }
 
 .buy-btn{
-    width:100%;
+    width:200px;
     padding:10px;
-    background:#0d6efd;
+    background:lab(77.8% -51.88 39.29);
     color:#fff;
     border:none;
     border-radius:6px;
     cursor:pointer;
-    margin-top:10px;
+    margin:10px;
 }
 
 .buy-btn:hover{
-    background:#084298;
+    background:lab(81.62% -79.88 74.17);
+}
+.Card-btn{
+    width:200px;
+    padding:10px;
+    background:hsl(68, 84%, 62%);
+    color:black;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    margin:10px;
+}
+
+.Card-btn:hover{
+    background:hsl(68, 98%, 52%);
 }

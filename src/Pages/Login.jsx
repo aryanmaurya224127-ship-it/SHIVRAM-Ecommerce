@@ -12,7 +12,7 @@ function Login() {
       <div className="login-box">
 
         <h1 className="logo">SHIVRAM</h1>
-        <h2>Welcome Back 👋</h2>
+        <h2>Welcome Back </h2>
         <p>Login to continue shopping</p>
 
         <form>
@@ -23,6 +23,7 @@ function Login() {
               placeholder="Enter your email"
               required
             />
+            
           </div>
 
           <div className="input-group">
@@ -36,6 +37,13 @@ function Login() {
 
           <div className="options">
             <label>
+              <input 
+                type="checkbox"
+                checked={showPassword}
+                onChange={() => setShowPassword(!showPassword)}
+              />
+              Show Password
+               <br />
               <input type="checkbox" />
               Remember Me
             </label>
@@ -52,13 +60,7 @@ function Login() {
             <Link to="/signup">Sign Up</Link>
           </p>
 
-          <button
-            type="button"
-            className="show-btn"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? "Hide Password" : "Show Password"}
-          </button>
+          
         </form>
 
       </div>

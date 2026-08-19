@@ -113,3 +113,37 @@
     background:#0d6efd;
     color:#fff;
 }
+
+.password-input-wrapper{
+    position:relative;
+    display:flex;
+    align-items:center;
+}
+
+.password-input-wrapper input{
+    width:100%;
+    padding:12px;
+    padding-right:40px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    outline:none;
+    font-size:14px;
+}
+
+.password-input-wrapper input:focus{
+    border-color:#0d6efd;
+}
+
+.password-toggle-icon{
+    position:absolute;
+    right:12px;
+    cursor:pointer;
+    font-size:18px;
+    user-select:none;
+    transition:0.3s ease;
+}
+
+.password-toggle-icon:hover{
+    opacity:0.8;
+    transform:scale(1.1);
+}

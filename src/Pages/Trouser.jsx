@@ -1,5 +1,5 @@
 
-import TrouserStore from '../PagesItems/TrouserStore.jsx';
+import Products from '../Component/Products.jsx';
 import MainLayout from '../Layout/MainLayout.jsx';
 import '../Style/item.css'
 
@@ -14,7 +14,7 @@ function Trouser() {
               Perfect for office wear, casual outings, and every occasion,
               offering comfort, durability, and modern style.</p>
               </div>
-        <div className="row"><TrouserStore /></div>
+        <div className="row"><Products /></div>
         </div>
     </section>
     </MainLayout>

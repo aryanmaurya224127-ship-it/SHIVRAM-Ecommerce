@@ -24,7 +24,8 @@ function Navbar() {
         <div className="text-end">
           <NavLink to="/Login"><button className="btn btn-outline-light me-2">Login</button></NavLink>
           
-          <button className="btn btn-warning">Sign-up</button>
+        
+        <NavLink to="/Cart">  <button className="btn btn-warning">Cart</button></NavLink>
         </div>
 
       </div>

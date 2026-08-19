@@ -1,5 +1,5 @@
 
-import ShirtStore from '../PagesItems/ShirtStore.jsx';
+import Products from '../Component/Products.jsx';
 import MainLayout from '../Layout/MainLayout.jsx';
 import "bootstrap/dist/css/bootstrap.min.css";
 import '../Style/item.css'
@@ -14,7 +14,7 @@ function Shirt() {
         <p>Explore premium shirts from SHIVRAM. Find the perfect style for
               casual outings, office wear, and special occasions.</p>
       </div>
-        <div className="row"><ShirtStore /></div>
+        <div className="row"><Products /></div>
         </div>
     </section>
     </MainLayout>

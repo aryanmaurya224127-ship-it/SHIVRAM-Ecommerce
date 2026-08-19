@@ -1,5 +1,5 @@
 
-import WatchStore from '../PagesItems/WatchStore.jsx';
+import Products from '../Component/Products.jsx';
 import MainLayout from '../Layout/MainLayout.jsx';
 import "bootstrap/dist/css/bootstrap.min.css";
 import '../Style/item.css'
@@ -15,7 +15,7 @@ function Watch() {
               watches. Discover elegant, modern, and stylish timepieces
               designed for every occasion.</p>
               </div>
-        <div className="row"><WatchStore /></div>
+        <div className="row"><Products/></div>
         </div>
     </section>
     </MainLayout>

@@ -1,5 +1,5 @@
 
-import CasualShoesStore from '../PagesItems/CasualShoesStore.jsx';
+import Products from '../Component/Products.jsx';
 import MainLayout from '../Layout/MainLayout.jsx';
 
 import '../Style/item.css'
@@ -15,7 +15,7 @@ function CasualShoes() {
         <p> Discover SHIVRAM's premium casual shoes designed for everyday
               comfort, modern style, and long-lasting durability.</p>
               </div>
-        <div className="row"><CasualShoesStore /></div>
+        <div className="row"><Products /></div>
       
         </div>
     </section>

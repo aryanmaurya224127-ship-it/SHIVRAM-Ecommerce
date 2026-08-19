@@ -1,7 +1,6 @@
 import Navbar from "../Layout/Navbar";
 import Footer from "../Layout/Footer";
-import HomeStore from "../PagesItems/HomeStore";
-import "../Style/item.css";
+import Products from '../Component/Products.jsx';
 
 function Home() {
   return (
@@ -26,7 +25,7 @@ function Home() {
           </div>
 
           <div className="row g-4">
-            <HomeStore />
+            <Products/>
           </div>
 
         </div>

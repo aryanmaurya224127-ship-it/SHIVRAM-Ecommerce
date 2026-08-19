@@ -1,4 +1,4 @@
-import FormalShoesStore from "../PagesItems/FormalShoesStorage.jsx";
+import Products from '../Component/Products.jsx';
 import MainLayout from "../Layout/MainLayout.jsx";
 
 import "../Style/item.css";
@@ -20,7 +20,7 @@ function FormalShoes() {
           </div>
 
           <div className="row g-4">
-            <FormalShoesStore />
+            <Products />
           </div>
 
         </div>

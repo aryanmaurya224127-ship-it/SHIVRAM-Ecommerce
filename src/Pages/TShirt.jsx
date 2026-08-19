@@ -1,5 +1,5 @@
 
-import TShirtStore from '../PagesItems/TShirtStore.jsx';
+import Products from '../Component/Products.jsx';
 import MainLayout from '../Layout/MainLayout.jsx';
 import "bootstrap/dist/css/bootstrap.min.css";
 import '../Style/item.css'
@@ -15,7 +15,7 @@ function TShirt() {
               of men's T-Shirts. Choose from trendy, comfortable, and stylish
               designs perfect for casual wear and every season.</p>
               </div>
-        <div className="row"><TShirtStore /></div>
+        <div className="row"><Products /></div>
         </div>
     </section>
     </MainLayout>
