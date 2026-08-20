@@ -20,7 +20,7 @@ function Body() {
 
   return (
     <>
-      <Routes ClassName="container">
+      <Routes className="container">
         <Route path="/" element={<Home />} />
         <Route path="/Shirt" element={<Shirt/>} />
         <Route path="/TShirt" element={<TShirt/>} />

@@ -1,9 +1,10 @@
 
 import Products from '../Component/Products.jsx';
+import { trouser } from '../data/productsData.js';
 import MainLayout from '../Layout/MainLayout.jsx';
 import '../Style/item.css'
 
-function Trouser() {
+function TrouserPage() {
   return (
     <MainLayout>
     <section className='body-section'>
@@ -14,11 +15,11 @@ function Trouser() {
               Perfect for office wear, casual outings, and every occasion,
               offering comfort, durability, and modern style.</p>
               </div>
-        <div className="row"><Products /></div>
+        <div className="row"><Products products={trouser}/></div>
         </div>
     </section>
     </MainLayout>
   );
 }
 
-export default Trouser;
+export default TrouserPage;

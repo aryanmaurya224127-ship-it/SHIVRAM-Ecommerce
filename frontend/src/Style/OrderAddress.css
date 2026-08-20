@@ -1,0 +1,17 @@
+
+body{
+  background-color: rgb(235, 231, 231);
+}
+input{
+  margin:4px;
+  padding:0;
+  height: 10%;
+  width: 85%;
+}
+button{
+  color:white;
+  background-color: blue;
+  border-radius: 5%;
+  border-color:aqua;
+  
+}
