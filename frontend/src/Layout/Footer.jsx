@@ -1,13 +1,27 @@
+import { NavLink } from "react-router-dom";
 import "../Style/Footer.css";
 
 function Footer() {
   return (
-    <footer className="container-fluid bg-dark text-light mt-5 py-5">
+    <footer className="container-fluid bg-dark text-light mt-5 ">
+         {/* Customer Support */}
+          <div className="icons">
+        <NavLink to="/MyAccount">My Account</NavLink>
+        <NavLink to="/Orders">Orders</NavLink>
+        <NavLink to="/Returns">Returns</NavLink>
+        <NavLink to="/FAQs">FAQs</NavLink>
+        <NavLink to="/ContactUs">Contact Us</NavLink>
+      </div>
     <div className="container">
   <div className="row">
 
-      <div className="col-lg-4 col-md-6 mb-4">
-            <h3 className="text-warning fw-bold">SHIVRAM</h3>
+      
+              <div className="logo-name ">
+          <NavLink to="/" className="Logo"style={{color:"blue"}}>
+        SHIV<span id="ANAND" style={{color:"lch(51.09% 96.03 40.51)"}}>RAM</span>
+          </NavLink>
+        </div>
+          <div className="col-lg-4 col-md-6 mb-4">
         <p>
             SHIVRAM is your trusted destination for premium men's fashion.
           Explore stylish Shirts, T-Shirts, Trousers, Watches, Casual Shoes,
@@ -15,33 +29,14 @@ function Footer() {
       </p>
           </div>
 
-          {/* Categories */}
-          <div className="col-lg-2 col-md-6 mb-4">
-            <h5 className="text-warning">Categories</h5>
-            <ul className="nav flex-column">
-          <li className="nav-item"><a href="/shirt" className="nav-link text-light">Shirts</a></li>
-            <li className="nav-item"><a href="/tshirt" className="nav-link text-light">T-Shirts</a></li>
-            <li className="nav-item"><a href="/trouser" className="nav-link text-light">Trousers</a></li>
-          <li className="nav-item"><a href="/watch" className="nav-link text-light">Watches</a></li>
-            <li className="nav-item"><a href="/CasualShoes" className="nav-link text-light">Casual Shoes</a></li>
-      <li className="nav-item"><a href="/FormalShoes" className="nav-link text-light">Formal Shoes</a></li>
-            </ul>
-          </div>
 
-          {/* Customer Support */}
-          <div className="col-lg-2 col-md-6 mb-4">
-    <h5 className="text-warning">Support</h5>
-          <ul className="nav flex-column">
-      <li className="nav-item"><a href="#" className="nav-link text-light">My Account</a></li>
-          <li className="nav-item"><a href="#" className="nav-link text-light">Orders</a></li>
-    <li className="nav-item"><a href="#" className="nav-link text-light">Returns</a></li>
-        <li className="nav-item"><a href="#" className="nav-link text-light">FAQs</a></li>
-        <li className="nav-item"><a href="#" className="nav-link text-light">Contact Us</a></li>
-          </ul>
-          </div>
+         {/* Customer Support */}
+          
+
+        
 
           {/* Newsletter */}
-          <div className="col-lg-4 col-md-6 mb-4">
+          <div className="col-lg-4 col-md-6 m-4">
             <h5 className="text-warning">Newsletter</h5>
             <p>
               Subscribe to receive updates about new arrivals, offers and

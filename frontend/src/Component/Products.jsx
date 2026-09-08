@@ -1,7 +1,7 @@
 
-
+import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-
+import '../Style/item.css'
 function Products({products}) {
 
   const { addToCart } = useCart();
@@ -9,17 +9,24 @@ function Products({products}) {
   return (  
     <div className="products-container">
       {products.map((product) => {
+         console.log("PRODUCT:", product);
+  console.log("PRODUCT ID:", product.productId);
         const finalPrice =
           product.Price - (product.Price * product.Discount) / 100;
 
         return (
-          <div className="product-card" key={product.id}>
+          
+          
+          <div className="product-card" key={product.productId}>
   <div className="image-box">
+    <Link to={`/ProductDetail/${product.productId}`}>
     <img
       src={product.image}
       alt={product.CardTitle}
       className="product-image"
     />
+    </Link>
+    
 
     <span className="offer-badge">
       {product.Discount}% OFF
@@ -39,8 +46,11 @@ function Products({products}) {
 <p className="delivery">
     🚚 Free Delivery
 </p>
-  <a href="/ProductDetail"><button className="buy-btn">Detail Now</button></a>
-   <button className="Card-btn" onClick={() => addToCart(product)}>Add to Card</button>
+
+  <button className="btn btn-warning px-4" onClick={() => addToCart(product)} >
+  Add to Cart
+</button>
+
 </div>
         );
       })}

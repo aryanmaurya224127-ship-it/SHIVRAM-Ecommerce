@@ -12,7 +12,7 @@ function BuyButton() {
         <MainLayout>
           <div>
             
-        </div>.
+        </div>
       </MainLayout>
     
     </>

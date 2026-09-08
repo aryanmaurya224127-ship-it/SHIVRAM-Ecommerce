@@ -1,23 +1,37 @@
 import "../Style/Header.css";
-
-import { NavLink } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 function Navbar() {
-  return (
+  const [search,setSearch] = useState("") ;
+  const navigate = useNavigate();
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if(search.trim()===""){
+      return;
+    }
+    navigate(`/Search?query=${encodeURIComponent(search)}`);
+  }
+
+
+   return (
     <header className="Head">
       <div className="c">
 
-        <div className="logo-name">
-          <NavLink to="/" className="border">
-        SHIV<span id="ANAND">RAM</span>
+        <div className="logo-name ">
+          <NavLink to="/" className="Logo"style={{color:"blue"}}>
+        SHIV<span id="ANAND" style={{color:"lch(51.09% 96.03 40.51)"}}>RAM</span>
           </NavLink>
         </div>
 
-        <form className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-      <input
+         <form className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"onSubmit={handleSearch}>
+          <input
             type="search"
             className="form-control form-control-dark text-bg-dark"
-            placeholder="Search..."
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </form>
 

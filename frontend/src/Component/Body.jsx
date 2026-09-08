@@ -10,6 +10,7 @@ import FormalShoesPage from "../Pages/FormalShoesPage.jsx";
 import BuyButton from "../Pages/BuyButton.jsx";
 import Login from '../Pages/Login.jsx'
 import Cart from '../Pages/Cart.jsx'
+import Search from '../Pages/Search.jsx'
 import ProductDetail from "../Pages/ProductDetail.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import '../Style/App.css'
@@ -20,19 +21,20 @@ function Body() {
 
   return (
     <>
-      <Routes className="container">
+      <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/ShirtPage" element={<ShirtPage/>} />
         <Route path="/TShirtPage" element={<TShirtPage/>} />
         <Route path="/TrouserPage" element={<TrouserPage />} />
-        <Route path="/WatchPAge" element={<WatchPage/>} /> 
+        <Route path="/WatchPage" element={<WatchPage/>} /> 
         <Route path="/CasualShoesPage" element={<CasualShoesPage/>} />
-        <Route path="FormalShoesPage" element={<FormalShoesPage />} />
-        <Route path="BuyButton" element={<BuyButton/>} />
+        <Route path="/FormalShoesPage" element={<FormalShoesPage />} />
+        <Route path="/BuyButton" element={<BuyButton/>} />
         <Route path="/Login" element={<Login/>} />
         <Route path="/Cart" element={<Cart/>} />
         
-        <Route path="/ProductDetail" element={<ProductDetail/>} />
+        <Route path="/ProductDetail/:productId" element={<ProductDetail/>} />
+        <Route path="/Search" element={<Search />} />
 
       </Routes>
     </>

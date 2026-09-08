@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Link } from "react-router-dom";
 import MainLayout from "../Layout/MainLayout";
+import { NavLink } from "react-router-dom";
 import "../Style/Login.css";
 
 function Login() {
@@ -9,9 +10,13 @@ function Login() {
   return (
     <MainLayout>
     <div className="login-container">
+      
       <div className="login-box">
-
-        <h1 className="logo">SHIVRAM</h1>
+        <div className="logo-name "style={{textAlign:"center"}}>
+          <NavLink to="/" className="Logo"style={{color:"blue"}}>
+        SHIV<span id="ANAND" style={{color:"lch(51.09% 96.03 40.51)"}}>RAM</span>
+          </NavLink>
+        </div>
         <h2>Welcome Back </h2>
         <p>Login to continue shopping</p>
 
