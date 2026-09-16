@@ -3,50 +3,23 @@ import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Products from "../Component/Products.jsx";
 import MainLayout from "../Layout/MainLayout.jsx";
+import { useProducts } from "../context/ProductContext.jsx";
 
 function Search() {
   const [searchParams] = useSearchParams();
+   const query = searchParams.get("query") || ""; const searchText = query.toLowerCase().trim(); const { products, loading } = useProducts(); 
 
-  const query = searchParams.get("query") || "";
-  const searchText = query.toLowerCase().trim();
-
-  const [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/products"
-        );
-
-        if (!response.ok) {
-          throw new Error("Products fetch failed");
-        }
-
-        const data = await response.json();
-
-        setAllProducts(data);
-      } catch (error) {
-        console.error("Search Products Error:", error);
-        setAllProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  const filteredProducts = allProducts.filter((product) =>
-    product.CardTitle?.toLowerCase().includes(searchText) ||
+   const filteredProducts = products.filter((product) =>
+     product.CardTitle?.toLowerCase().includes(searchText) ||
     product.ItemContent?.toLowerCase().includes(searchText) ||
-    product.Category?.toLowerCase().includes(searchText)
-  );
+     product.Category?.toLowerCase().includes(searchText) );
 
   return (
     <MainLayout>
       <div className="container mt-4">
+
+        {/* Search Heading */}
+         {searchText && ( <h3 className="mb-4"> Search Results for: "{query}" </h3> )}
 
         {/* Loading */}
         {loading ? (
@@ -59,17 +32,14 @@ function Search() {
 
         ) : (
 
-          <h4
-            className="text-danger mt-4"
-            style={{
-              width: "2000px",
-              height: "80px",
-              fontSize: "32px",
-              fontWeight: "bold",
-            }}
-          >
-            404 No Product Found
-          </h4>
+          <div className="text-center mt-5"> 
+          <h4 className="text-danger">
+             404 - No Product Found 
+           </h4> 
+             <p className="text-secondary">
+               Try searching with another product name or category.
+              </p>
+          </div>
 
         )}
 

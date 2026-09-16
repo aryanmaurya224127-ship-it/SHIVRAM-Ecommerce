@@ -1,57 +1,108 @@
 
-import { Link } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import '../Style/item.css'
-function Products({products}) {
+import { useAuth } from "../context/AuthContext";
+import "../Style/item.css";
 
+function Products({ products }) {
   const { addToCart } = useCart();
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
 
-  return (  
+  // LOGIN CHECK
+  const requireLogin = (action) => {
+    if (!isLoggedIn) {
+      const shouldLogin = window.confirm(
+        `🔐 Login Required\n\nPlease login to ${action}.\n\nClick OK to login.`
+      );
+
+      if (shouldLogin) {
+        navigate("/Login");
+      }
+
+      return false;
+    }
+
+    return true;
+  };
+
+  // ADD TO CART
+  const handleAddToCart = (product) => {
+    if (!requireLogin("continue shopping")) {
+      return;
+    }
+
+    addToCart(product);
+  };
+
+  // PRODUCT DETAIL
+  const handleProductDetail = (productId) => {
+    if (!requireLogin("view product details")) {
+      return;
+    }
+
+    navigate(`/ProductDetail/${productId}`);
+  };
+
+  return (
     <div className="products-container">
       {products.map((product) => {
-         console.log("PRODUCT:", product);
-  console.log("PRODUCT ID:", product.productId);
+        console.log("PRODUCT:", product);
+        console.log("PRODUCT ID:", product.productId);
+
         const finalPrice =
           product.Price - (product.Price * product.Discount) / 100;
 
         return (
-          
-          
           <div className="product-card" key={product.productId}>
-  <div className="image-box">
-    <Link to={`/ProductDetail/${product.productId}`}>
-    <img
-      src={product.image}
-      alt={product.CardTitle}
-      className="product-image"
-    />
-    </Link>
-    
 
-    <span className="offer-badge">
-      {product.Discount}% OFF
-    </span>
-  </div>
+            <div className="image-box">
 
-  <h3>{product.CardTitle}</h3>
-  <p>{product.ItemContent}</p>
+              {/* PRODUCT IMAGE */}
+              <button
+                type="button"
+                className="product-link-button"
+                onClick={() => handleProductDetail(product.productId)}
+              >
+                <img
+                  src={product.image}
+                  alt={product.CardTitle}
+                  className="product-image"
+                />
+              </button>
 
-  <p className="old-price">₹{product.Price}</p>
-  <h3 className="new-price">
-    ₹{finalPrice}
-  </h3>
-  <p className="rating">
-    ⭐ {product.Rating} | ({product.Reviews} Reviews )
-</p> 
-<p className="delivery">
-    🚚 Free Delivery
-</p>
+              <span className="offer-badge">
+                {product.Discount}% OFF
+              </span>
+            </div>
 
-  <button className="btn btn-warning px-4" onClick={() => addToCart(product)} >
-  Add to Cart
-</button>
+            <h3>{product.CardTitle}</h3>
 
-</div>
+            <p>{product.ItemContent}</p>
+
+            <p className="old-price">₹{product.Price}</p>
+
+            <h3 className="new-price">
+              ₹{finalPrice}
+            </h3>
+
+            <p className="rating">
+              ⭐ {product.Rating} | ({product.Reviews} Reviews)
+            </p>
+
+            <p className="delivery">
+              🚚 Free Delivery
+            </p>
+
+            {/* ADD TO CART */}
+            <button
+              className="btn btn-warning px-4"
+              onClick={() => handleAddToCart(product)}
+            >
+              Add to Cart
+            </button>
+
+          </div>
         );
       })}
     </div>
@@ -59,3 +110,4 @@ function Products({products}) {
 }
 
 export default Products;
+

@@ -1,3 +1,332 @@
 
 
- 
+
+/* =========================================
+   SHIVRAM - PRODUCTS / CATEGORY PAGE
+   ========================================= */
+
+/* Main Product Container */
+.products-container {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  padding: 20px 0;
+}
+
+
+/* =========================================
+   PRODUCT CARD
+   ========================================= */
+
+.product-card {
+  background: #ffffff;
+  border: 1px solid #e1e5ea;
+  border-radius: 12px;
+  padding: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================================
+   PRODUCT IMAGE
+   ========================================= */
+
+.image-box {
+  width: 100%;
+  height: 270px;
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f8f9fa;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+
+/* =========================================
+   OFFER BADGE
+   ========================================= */
+
+.offer-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+
+  background: #198754;
+  color: white;
+
+  padding: 5px 9px;
+  border-radius: 5px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* =========================================
+   PRODUCT TITLE
+   ========================================= */
+
+.product-card h3 {
+  margin: 14px 0 7px;
+
+  font-size: 18px;
+  line-height: 1.4;
+
+  color: #212529;
+  font-weight: 600;
+}
+
+
+/* =========================================
+   PRODUCT DESCRIPTION
+   ========================================= */
+
+.product-card > p {
+  margin: 0 0 8px;
+
+  color: #6c757d;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   PRICE
+   ========================================= */
+
+.old-price {
+  text-decoration: line-through;
+
+  color: #888 !important;
+
+  font-size: 14px !important;
+  margin-bottom: 2px !important;
+}
+
+.new-price {
+  color: #0b3d91 !important;
+
+  font-size: 22px !important;
+  font-weight: 700 !important;
+
+  margin: 0 0 8px !important;
+}
+
+
+/* =========================================
+   RATING
+   ========================================= */
+
+.rating {
+  color: #333 !important;
+
+  font-size: 13px !important;
+  font-weight: 500;
+
+  margin-bottom: 6px !important;
+}
+
+
+/* =========================================
+   DELIVERY
+   ========================================= */
+
+.delivery {
+  color: #198754 !important;
+
+  font-size: 13px !important;
+  font-weight: 600;
+
+  margin-bottom: 14px !important;
+}
+
+
+/* =========================================
+   ADD TO CART BUTTON
+   ========================================= */
+
+.product-card .btn-warning {
+  width: 100%;
+
+  margin-top: auto;
+
+  border: none;
+  border-radius: 7px;
+
+  font-weight: 600;
+  font-size: 15px;
+
+  padding: 9px 15px;
+
+  transition: all 0.25s ease;
+}
+
+.product-card .btn-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================================
+   CATEGORY PAGE CONTENT
+   ========================================= */
+
+.ItemContent {
+  text-align: center;
+
+  padding: 25px 10px 10px;
+}
+
+.ItemContent h2 {
+  margin-bottom: 10px;
+
+  font-size: 30px;
+  font-weight: 700;
+
+  color: #212529;
+}
+
+.ItemContent p {
+  max-width: 800px;
+
+  margin: 0 auto;
+
+  color: #6c757d;
+
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   RESPONSIVE - LAPTOP
+   ========================================= */
+
+@media (max-width: 1200px) {
+
+  .products-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .image-box {
+    height: 250px;
+  }
+
+}
+
+
+/* =========================================
+   RESPONSIVE - TABLET
+   ========================================= */
+
+@media (max-width: 900px) {
+
+  .products-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .image-box {
+    height: 240px;
+  }
+
+  .ItemContent h2 {
+    font-size: 26px;
+  }
+
+}
+
+
+/* =========================================
+   RESPONSIVE - MOBILE
+   ========================================= */
+
+@media (max-width: 576px) {
+
+  .products-container {
+    grid-template-columns: 1fr;
+    gap: 18px;
+
+    padding: 15px 10px;
+  }
+
+  .product-card {
+    padding: 14px;
+  }
+
+  .image-box {
+    height: 280px;
+  }
+
+  .product-card h3 {
+    font-size: 17px;
+  }
+
+  .new-price {
+    font-size: 21px !important;
+  }
+
+  .ItemContent {
+    padding: 20px 10px 5px;
+  }
+
+  .ItemContent h2 {
+    font-size: 23px;
+  }
+
+  .ItemContent p {
+    font-size: 14px;
+  }
+
+}
+
+
+/* =========================================
+   VERY SMALL MOBILE
+   ========================================= */
+
+@media (max-width: 400px) {
+
+  .image-box {
+    height: 250px;
+  }
+
+  .product-card {
+    padding: 12px;
+  }
+
+  .offer-badge {
+    font-size: 11px;
+    padding: 4px 7px;
+  }
+
+}

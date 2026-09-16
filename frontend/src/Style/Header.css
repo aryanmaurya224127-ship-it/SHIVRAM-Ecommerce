@@ -1,138 +1,648 @@
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
+/* =====================================
+   MAIN HEADER
+===================================== */
+
 .Head {
   width: 100%;
-  background: #1f2937;
+  background: #212529;
   color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1000;
 }
 
-/* Top Navbar */
+/* =====================================
+   TOP NAVBAR
+===================================== */
 
-.c {
+.navbar-top {
+  width: 100%;
+  min-height: 75px;
+
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 15px 5% ;
-  gap: 15px;
+  justify-content: space-between;
+
+  padding: 12px 30px;
+
+  gap: 25px;
 }
 
-/* Logo */
+/* =====================================
+   LOGO
+===================================== */
 
-.logo-name a {
+.logo-name {
+  flex-shrink: 0;
+}
+
+.Logo {
   text-decoration: none;
-  font-size: 28px;
-  font-weight: bold;
-  color: white;
-  letter-spacing: 1.5%;
+
+  font-size: 30px;
+  font-weight: 700;
+
+  color: blue;
+
+  letter-spacing: 1px;
 }
 
+.Logo:hover {
+  text-decoration: none;
+}
 
-/* Login Buttons */
+.logo-ram {
+  color: lch(51.09% 96.03 40.51);
+}
 
-.text-end {
+/* =====================================
+   SEARCH
+===================================== */
+
+.search-form {
   display: flex;
-  gap: 10px;
+  align-items: center;
+
+  width: 100%;
+  max-width: 550px;
+
+  margin: 0 auto;
+
+  position: relative;
 }
 
-.text-end button {
-  padding: 10px 18px;
-  border-radius: 25px;
+.search-form input {
+  width: 100%;
+
+  height: 42px;
+
+  padding: 0 50px 0 15px;
+
+  border: 1px solid #555;
+
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #343a40;
+
+  color: white;
+
+  font-size: 14px;
+}
+
+.search-form input::placeholder {
+  color: #aaa;
+}
+
+.search-form input:focus {
+  border-color: #0d6efd;
+
+  box-shadow:
+    0 0 0 2px rgba(13, 110, 253, 0.25);
+}
+
+/* SEARCH BUTTON */
+
+.search-form button {
+  position: absolute;
+
+  right: 5px;
+  top: 4px;
+
+  width: 34px;
+  height: 34px;
+
   border: none;
+
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: white;
+
   cursor: pointer;
-  transition: .3s;
+
+  font-size: 16px;
 }
 
-.text-end button:hover {
-  transform: translateY(-2px);
+.search-form button:hover {
+  background: #495057;
 }
 
-/* Bottom Menu */
+/* =====================================
+   RIGHT ACTIONS
+===================================== */
+
+.navbar-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+/* =====================================
+   LOGIN BUTTON
+===================================== */
+
+.login-nav-btn {
+  border: 1px solid white;
+
+  background: transparent;
+
+  color: white;
+
+  padding: 8px 18px;
+
+  border-radius: 6px;
+
+  font-size: 15px;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.login-nav-btn:hover {
+  background: white;
+
+  color: #212529;
+}
+
+/* =====================================
+   PROFILE
+===================================== */
+
+.profile-wrapper {
+  position: relative;
+}
+
+/* PROFILE CIRCLE */
+
+.profile-circle {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  border: 2px solid white;
+
+  background: #0d6efd;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+
+  padding: 0;
+}
+
+.profile-circle:hover {
+  transform: scale(1.05);
+
+  box-shadow:
+    0 0 0 3px rgba(13, 110, 253, 0.3);
+}
+
+/* =====================================
+   PROFILE DROPDOWN
+===================================== */
+
+.profile-dropdown {
+  position: absolute;
+
+  top: 52px;
+
+  right: 0;
+
+  width: 280px;
+
+  background: white;
+
+  color: #222;
+
+  border-radius: 12px;
+
+  padding: 22px;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.3);
+
+  text-align: center;
+
+  animation: profileOpen 0.15s ease;
+
+  z-index: 9999;
+}
+
+@keyframes profileOpen {
+  from {
+    opacity: 0;
+
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+/* =====================================
+   LARGE PROFILE AVATAR
+===================================== */
+
+.profile-avatar-large {
+  width: 65px;
+  height: 65px;
+
+  margin: 0 auto 12px;
+
+  border-radius: 50%;
+
+  background: #0d6efd;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 28px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+/* =====================================
+   PROFILE NAME
+===================================== */
+
+.profile-dropdown h4 {
+  margin: 5px 0;
+
+  font-size: 18px;
+
+  font-weight: 600;
+
+  color: #222;
+}
+
+/* =====================================
+   EMAIL
+===================================== */
+
+.profile-email {
+  margin: 6px 0;
+
+  font-size: 14px;
+
+  color: #666;
+
+  word-break: break-word;
+}
+
+/* =====================================
+   PHONE
+===================================== */
+
+.profile-phone {
+  margin: 6px 0;
+
+  font-size: 13px;
+
+  color: #777;
+}
+
+/* =====================================
+   LINE
+===================================== */
+
+.profile-dropdown hr {
+  margin: 18px 0;
+
+  border: none;
+
+  border-top: 1px solid #ddd;
+}
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+.logout-btn {
+  width: 100%;
+
+  padding: 9px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: #dc3545;
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #bb2d3b;
+}
+
+/* =====================================
+   CART
+===================================== */
+
+.cart-link {
+  text-decoration: none;
+}
+
+.cart-btn {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  border: none;
+
+  background: #ffc107;
+
+  color: #212529;
+
+  padding: 9px 15px;
+
+  border-radius: 6px;
+
+  font-size: 15px;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.cart-btn:hover {
+  background: #ffca2c;
+
+  transform: translateY(-1px);
+}
+
+
+/* =====================================
+   CART COUNT BADGE
+===================================== */
+
+.cart-count {
+  position: absolute;
+
+  top: -9px;
+
+  right: -8px;
+
+  min-width: 21px;
+
+  height: 21px;
+
+  padding: 0 5px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #dc3545;
+
+  color: white;
+
+  border: 2px solid #212529;
+
+  border-radius: 50%;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  z-index: 5;
+}
+/* =====================================
+   CATEGORY NAVIGATION
+===================================== */
 
 .icons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 35px;
-  padding: 15px;
-  background: #111827;
+  width: 100%;
 
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 28px;
+
+  padding: 12px 20px;
+
+  background: #343a40;
+
+  border-top: 1px solid #444;
 }
 
 .icons a {
   color: white;
+
   text-decoration: none;
-  font-size: 17px;
+
+  font-size: 15px;
+
   font-weight: 500;
-  transition: .3s;
-  position: relative;
+
+  transition: 0.2s ease;
+
+  padding: 5px 0;
 }
 
 .icons a:hover {
-  color: orange;
+  color: #ffc107;
 }
 
-.icons a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -6px;
-  width: 0%;
-  height: 2px;
-  background: orange;
-  transition: .3s;
+/* ACTIVE LINK */
+
+.icons a.active {
+  color: #ffc107;
+
+  font-weight: 600;
 }
 
-.icons a:hover::after {
-  width: 100%;
+/* =====================================
+   TABLET
+===================================== */
+
+@media (max-width: 900px) {
+
+  .navbar-top {
+    padding: 12px 20px;
+
+    gap: 15px;
+  }
+
+  .Logo {
+    font-size: 26px;
+  }
+
+  .search-form {
+    max-width: 400px;
+  }
+
+  .icons {
+    gap: 20px;
+  }
+
 }
 
-/* Active Link */
+/* =====================================
+   MOBILE
+===================================== */
 
-.icons .active {
-  color: orange;
-}
+@media (max-width: 700px) {
 
-.icons .active::after {
-  width: 100%;
-}
+  .navbar-top {
+    flex-wrap: wrap;
 
-/* Responsive */
+    justify-content: center;
 
-@media (max-width: 768px) {
+    padding: 15px;
+  }
 
-  .c {
-    flex-direction: column;
+  .logo-name {
+    width: 100%;
+
     text-align: center;
   }
 
-  form {
+  .search-form {
     width: 100%;
-  }
 
-  form input {
     max-width: 100%;
+
+    order: 3;
   }
 
-  .text-end {
-    width: 100%;
-    justify-content: center;
+  .navbar-actions {
+    position: absolute;
+
+    top: 18px;
+
+    right: 15px;
+  }
+
+  .login-nav-btn {
+    padding: 7px 12px;
+
+    font-size: 14px;
+  }
+
+  .cart-btn {
+    padding: 8px 10px;
+  }
+
+  .cart-btn span {
+    display: none;
   }
 
   .icons {
     gap: 15px;
-    padding: 12px;
+
+    padding: 10px;
+
+    justify-content: center;
   }
 
   .icons a {
-    font-size: 15px;
+    font-size: 13px;
   }
 
-  .logo-name a {
-    font-size: 24px;
+  .profile-dropdown {
+    right: -5px;
+
+    width: 260px;
   }
+
+}
+
+/* =====================================
+   SMALL MOBILE
+===================================== */
+
+@media (max-width: 450px) {
+
+  .Logo {
+    font-size: 25px;
+  }
+
+  .navbar-top {
+    min-height: 125px;
+  }
+
+  .navbar-actions {
+    top: 14px;
+
+    right: 10px;
+  }
+
+  .profile-circle {
+    width: 38px;
+
+    height: 38px;
+
+    font-size: 16px;
+  }
+
+  .cart-btn {
+    padding: 7px 9px;
+  }
+
+  .icons {
+    gap: 10px 15px;
+  }
+
+  .icons a {
+    font-size: 12px;
+  }
+
 }
