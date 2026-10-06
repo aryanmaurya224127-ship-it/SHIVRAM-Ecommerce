@@ -177,36 +177,6 @@ function Register() {
               />
             </div>
 
-            {/* Password */}
-            <div className="input-group">
-              <label>Password</label>
-
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter password"
-                value={formData.password}
-                onChange={handleChange}
-                minLength={6}
-                required
-              />
-            </div>
-
-            {/* Confirm Password */}
-            <div className="input-group">
-              <label>Confirm Password</label>
-
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                minLength={6}
-                required
-              />
-            </div>
-
             {/* Phone */}
             <div className="input-group">
               <label>Phone No.</label>
@@ -275,6 +245,36 @@ function Register() {
                 onChange={handleChange}
                 maxLength={6}
                 inputMode="numeric"
+                required
+              />
+            </div>
+
+              {/* Password */}
+            <div className="input-group">
+              <label>Create Password</label>
+
+              <input
+                type="password"
+                name="password"
+                placeholder="Enter password"
+                value={formData.password}
+                onChange={handleChange}
+                minLength={6}
+                required
+              />
+            </div>
+
+            {/* Confirm Password */}
+            <div className="input-group">
+              <label>Confirm Password</label>
+
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                minLength={6}
                 required
               />
             </div>

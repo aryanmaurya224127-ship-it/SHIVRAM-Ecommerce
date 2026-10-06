@@ -7,7 +7,7 @@ function Footer() {
          {/* Customer Support */}
           <div className="icons">
         <NavLink to="/MyAccount">My Account</NavLink>
-        <NavLink to="/Orders">Orders</NavLink>
+        <NavLink to="/MyOrders"> My Orders</NavLink>
         <NavLink to="/Returns">Returns</NavLink>
         <NavLink to="/FAQs">FAQs</NavLink>
         <NavLink to="/ContactUs">Contact Us</NavLink>

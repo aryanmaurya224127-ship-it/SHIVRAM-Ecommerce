@@ -14,9 +14,10 @@ import Search from "../Pages/Search.jsx";
 import ProductDetail from "../Pages/ProductDetail.jsx";
 import Register from "../Pages/Register.jsx";
 import ForgotPassword  from "../Pages/ForgoyPassword.jsx";
+import OrderPage from '../Pages/OrderPage.jsx';
+import MyOrders from '../Pages/MyOrders.jsx';
 
 import ProtectedRoute from "./ProtectedRoute.jsx";
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../Style/App.css";
 
@@ -39,26 +40,13 @@ function Body() {
         <Route path="/Login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/BuyButton" element={<BuyButton />} />
+        <Route path="/order" element={<OrderPage />} />
+        <Route path="/MyOrders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
 
         {/* Protected Cart */}
-        <Route
-          path="/Cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          }
-        />
-
+        <Route  path="/Cart" element={<ProtectedRoute><Cart /></ProtectedRoute>}/>
         {/* Protected Product Detail */}
-        <Route
-          path="/ProductDetail/:productId"
-          element={
-            <ProtectedRoute>
-              <ProductDetail />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/ProductDetail/:productId" element={<ProtectedRoute> <ProductDetail /> </ProtectedRoute>  }/>
 
       
 
