@@ -1,5 +1,14 @@
 const mongoose = require("mongoose");
 
+const productReviewSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  userName: { type: String, required: true, trim: true },
+  orderId: { type: String, required: true },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  comment: { type: String, trim: true, maxlength: 1000, default: "" },
+  createdAt: { type: Date, default: Date.now }
+}, { _id: true });
+
 const productSchema = new mongoose.Schema(
   {
     productId: {
@@ -46,7 +55,9 @@ const productSchema = new mongoose.Schema(
     ItemContent: {
       type: String,
       required: true
-    }
+    },
+
+    customerReviews: { type: [productReviewSchema], default: [] }
   },
   {
     timestamps: true

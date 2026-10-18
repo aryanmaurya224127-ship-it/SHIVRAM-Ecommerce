@@ -288,6 +288,24 @@ function Navbar() {
 
                   <hr />
 
+                  <button
+                    type="button"
+                    className="logout-btn"
+                    onClick={() => { setProfileOpen(false); navigate("/MyAccount"); }}
+                  >
+                    My Account · {Number(user?.coins || 0)} Coins
+                  </button>
+
+                  <button
+                    type="button"
+                    className="logout-btn"
+                    onClick={() => { setProfileOpen(false); navigate("/MyOrders"); }}
+                  >
+                    My Orders
+                  </button>
+
+                  <hr />
+
 
                   {/* LOGOUT */}
 

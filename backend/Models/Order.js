@@ -55,6 +55,24 @@ const orderSchema = new mongoose.Schema(
       required: true
     },
 
+    coinsEarned: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    coinsUsed: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    originalAmount: {
+      type: Number,
+      required: true,
+      min: 0
+    },
+
     shippingDetails: {
       fullName: {
         type: String,

@@ -16,6 +16,7 @@ import Register from "../Pages/Register.jsx";
 import ForgotPassword  from "../Pages/ForgoyPassword.jsx";
 import OrderPage from '../Pages/OrderPage.jsx';
 import MyOrders from '../Pages/MyOrders.jsx';
+import MyAccount from '../Pages/MyAccount.jsx';
 
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -42,6 +43,7 @@ function Body() {
         <Route path="/BuyButton" element={<BuyButton />} />
         <Route path="/order" element={<OrderPage />} />
         <Route path="/MyOrders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+        <Route path="/MyAccount" element={<ProtectedRoute><MyAccount /></ProtectedRoute>} />
 
         {/* Protected Cart */}
         <Route  path="/Cart" element={<ProtectedRoute><Cart /></ProtectedRoute>}/>

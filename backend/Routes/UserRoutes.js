@@ -2,6 +2,10 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../Models/User.js");
+const {
+  authenticateToken,
+  requireAdmin,
+} = require("../Middleware/auth");
 
 const router = express.Router();
 
@@ -70,6 +74,7 @@ router.post("/register", async (req, res) => {
         city: newUser.city,
         state: newUser.state,
         pincode: newUser.pincode,
+        coins: newUser.coins || 0,
       },
     });
 
@@ -159,6 +164,7 @@ router.post("/login", async (req, res) => {
         city: user.city,
         state: user.state,
         pincode: user.pincode,
+        coins: user.coins || 0,
       },
     });
 
@@ -178,7 +184,8 @@ router.post("/login", async (req, res) => {
 // GET ALL USERS
 // ========================================
 
-router.get("/auth/users", async (req, res) => {
+router.get("/auth/users", authenticateToken,
+  requireAdmin,async (req, res) => {
   try {
 
     const users = await User.find()

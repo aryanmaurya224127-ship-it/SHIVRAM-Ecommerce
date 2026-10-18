@@ -29,6 +29,9 @@ const OrderPage = () => {
     product,
     quantity = 1,
     totalAmount,
+    originalAmount,
+    coinsUsed = 0,
+    coinsEarned = 0,
     shippingDetails
   } = orderDetails;
 
@@ -41,6 +44,9 @@ const OrderPage = () => {
         <h2 style={{ color: '#1e7e34', margin: '10px 0 5px 0' }}>Order Confirmed!</h2>
         <p style={{ margin: 0, color: '#555' }}>
           Thank you for your order. We have received your order and are processing it.
+        </p>
+        <p style={{ marginTop: '8px', fontWeight: 'bold', fontSize: '15px' }}>
+          🪙 You earned {coinsEarned} SHIVRAM Coins (₹{coinsEarned} wallet value)!
         </p>
         <p style={{ marginTop: '8px', fontWeight: 'bold', fontSize: '15px' }}>
           Order ID: <span style={{ color: '#007bff' }}>#{orderId}</span>
@@ -108,8 +114,10 @@ const OrderPage = () => {
               <h4 style={{ margin: '0 0 5px 0', fontSize: '16px' }}>{product?.title || product?.name}</h4>
               <p style={{ margin: '3px 0', fontSize: '14px', color: '#555' }}>Quantity: <strong>{quantity}</strong></p>
               <p style={{ margin: '3px 0', fontSize: '14px', color: '#555' }}>Price: ₹{product?.price}</p>
+              {coinsUsed > 0 && <p style={{ margin: '8px 0 0 0', fontSize: '14px', color: '#198754' }}>SHIVRAM Coins used: {coinsUsed} (−₹{coinsUsed})</p>}
+              {originalAmount != null && coinsUsed > 0 && <p style={{ margin: '3px 0', fontSize: '14px', color: '#555' }}>Original total: ₹{originalAmount}</p>}
               <p style={{ margin: '8px 0 0 0', fontSize: '16px', fontWeight: 'bold', color: '#28a745' }}>
-                Total Paid (COD): ₹{totalAmount}
+                Amount Payable: ₹{totalAmount}
               </p>
             </div>
           </div>

@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useState,
+  useCallback,
 } from "react";
 
 
@@ -115,6 +116,20 @@ export const AuthProvider = ({ children }) => {
 
 
   // ===================================================
+  // UPDATE CURRENT USER DETAILS
+  // ===================================================
+
+  const updateUser = useCallback((updates) => {
+    setUser((currentUser) => {
+      if (!currentUser) return currentUser;
+      const nextUser = { ...currentUser, ...updates };
+      localStorage.setItem("shivram_user", JSON.stringify(nextUser));
+      return nextUser;
+    });
+  }, []);
+
+
+  // ===================================================
   // LOGOUT
   // ===================================================
 
@@ -182,6 +197,7 @@ export const AuthProvider = ({ children }) => {
         user,
         login,
         logout,
+        updateUser,
         isLoggedIn,
         token,
       }}

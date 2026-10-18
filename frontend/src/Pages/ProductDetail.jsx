@@ -68,6 +68,9 @@ function ProductDetail() {
   const [paymentMethod, setPaymentMethod] =
     useState("UPI");
 
+  const [walletCoins, setWalletCoins] = useState(Number(user?.coins || 0));
+  const [coinsToUse, setCoinsToUse] = useState(0);
+
 
   // ===================================================
   // ADDRESS FORM
@@ -141,6 +144,23 @@ function ProductDetail() {
       pincode: user.pincode || "",
     });
 
+  }, [user]);
+
+
+  // ===================================================
+  // FETCH CURRENT WALLET BALANCE
+  // ===================================================
+
+  useEffect(() => {
+    const userId = user?._id || user?.id;
+    if (!userId) {
+      setWalletCoins(0);
+      return;
+    }
+    fetch(`${API_BASE_URL}/api/orders/wallet/${userId}`)
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("Wallet load nahi hua")))
+      .then((data) => setWalletCoins(Number(data.coins || 0)))
+      .catch((error) => console.error("Wallet fetch error:", error));
   }, [user]);
 
 
@@ -791,6 +811,11 @@ function ProductDetail() {
         totalAmount:
           Math.round(totalPrice),
 
+        coinsToUse: Math.min(
+          Math.max(0, Math.floor(Number(coinsToUse) || 0)),
+          walletCoins,
+          Math.round(totalPrice)
+        ),
 
         shippingDetails: {
 
@@ -831,26 +856,25 @@ function ProductDetail() {
       // ---------------------------------------------
       // SAVE ORDER IN MONGODB
       // ---------------------------------------------
+const token = localStorage.getItem("shivram_token");
 
-      const response =
-        await fetch(
-          `${API_BASE_URL}/api/orders`,
-          {
+if (!token) {
+  setErrorMessage("Session expired. Please login again.");
+  navigate("/Login");
+  return false;
+}
 
-            method: "POST",
-
-            headers: {
-
-              "Content-Type":
-                "application/json"
-
-            },
-
-            body:
-              JSON.stringify(orderData)
-
-          }
-        );
+const response = await fetch(
+  `${API_BASE_URL}/api/orders`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(orderData),
+  }
+);
 
 
       // ---------------------------------------------
@@ -998,6 +1022,15 @@ function ProductDetail() {
 
             totalAmount:
               savedOrder.totalAmount,
+
+            originalAmount:
+              savedOrder.originalAmount ?? Math.round(totalPrice),
+
+            coinsUsed:
+              savedOrder.coinsUsed ?? 0,
+
+            coinsEarned:
+              data?.coinsEarned ?? savedOrder.coinsEarned ?? 0,
 
 
             // ---------------------------------------
@@ -1644,6 +1677,30 @@ function ProductDetail() {
               <hr />
 
 
+              {/* SHIVRAM COINS WALLET */}
+              <div style={{ margin: "16px 0", padding: "14px", border: "1px solid #cfe8d5", borderRadius: "10px", background: "#f4fbf5" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+                  <strong>🪙 SHIVRAM Coins</strong>
+                  <span style={{ color: "#198754", fontWeight: 700 }}>{walletCoins} coins available (₹{walletCoins})</span>
+                </div>
+                <label htmlFor="coins-to-use" style={{ display: "block", marginTop: "10px", marginBottom: "5px" }}>Coins to redeem (1 coin = ₹1)</label>
+                <input
+                  id="coins-to-use"
+                  type="number"
+                  min="0"
+                  max={Math.min(walletCoins, Math.round(totalPrice))}
+                  step="1"
+                  value={coinsToUse}
+                  onChange={(event) => setCoinsToUse(Math.min(Math.max(0, Math.floor(Number(event.target.value) || 0)), walletCoins, Math.round(totalPrice)))}
+                  disabled={walletCoins <= 0}
+                  style={{ width: "100%", padding: "9px", border: "1px solid #ced4da", borderRadius: "6px" }}
+                />
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "10px", color: "#198754" }}>
+                  <span>Coins discount</span><strong>− ₹{Math.min(Math.max(0, Number(coinsToUse) || 0), walletCoins, Math.round(totalPrice))}</strong>
+                </div>
+                <small style={{ color: "#666" }}>Coins apply to this order only. Final balance is verified by the server.</small>
+              </div>
+
               {/* TOTAL */}
 
               <div className="total-row">
@@ -1653,10 +1710,15 @@ function ProductDetail() {
                 </span>
 
                 <strong>
-                  ₹{Math.round(totalPrice)}
+                  ₹{Math.max(0, Math.round(totalPrice) - Math.min(Math.max(0, Number(coinsToUse) || 0), walletCoins, Math.round(totalPrice)))}
                 </strong>
 
               </div>
+              {Number(coinsToUse) > 0 && (
+                <p style={{ color: "#198754", fontSize: "13px", marginTop: "8px" }}>
+                  You will pay ₹{Math.max(0, Math.round(totalPrice) - Math.min(Math.max(0, Number(coinsToUse) || 0), walletCoins, Math.round(totalPrice)))} after coin redemption.
+                </p>
+              )}
 
             </div>
 
