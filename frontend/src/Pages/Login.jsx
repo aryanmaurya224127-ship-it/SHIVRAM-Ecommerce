@@ -80,8 +80,8 @@ function Login() {
       setMessage("Login successful!");
 
       setTimeout(() => {
-        navigate("/");
-      }, 1000);
+        navigate(data.user?.role === "admin" ? "/AdminDashboard" : "/");
+      }, 500);
 
     } catch (error) {
       console.error("Login Error:", error);

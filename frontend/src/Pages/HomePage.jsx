@@ -18,7 +18,7 @@ function HomePage() {
       <section className="body-section py-5">
         <div className="container">
 
-          <div className="Item Content">
+          <div className="ItemContent">
             <h2 className="fw-bold">Welcome to SHIVRAM</h2>
 
             <p className="text-muted">

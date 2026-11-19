@@ -15,6 +15,7 @@
 }
 
 
+
 /* =========================================
    PRODUCT CARD
    ========================================= */
@@ -35,6 +36,77 @@
 .product-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================================
+   CATEGORY PAGE CONTENT - PREMIUM GRADIENT
+   ========================================= */
+
+.ItemContent {
+  position: relative;
+  overflow: hidden;
+
+  text-align: center;
+  padding: 38px 25px;
+  margin: 20px 0 30px;
+
+  background: linear-gradient(
+    135deg,
+    #172554 0%,
+    #1d4ed8 55%,
+    #312e81 100%
+  );
+
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  box-shadow: 0 8px 24px rgba(23, 37, 84, 0.18);
+
+  transition: box-shadow 0.3s ease;
+}
+
+.ItemContent:hover {
+  box-shadow: 0 12px 30px rgba(29, 78, 216, 0.25);
+}
+
+.ItemContent h2 {
+  margin-bottom: 14px;
+
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+
+  color: #ffffff;
+}
+
+.ItemContent p {
+  max-width: 800px;
+  margin: 0 auto;
+
+  color: #e0e7ff;
+
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* MOBILE RESPONSIVE */
+
+@media (max-width: 576px) {
+  .ItemContent {
+    padding: 28px 18px;
+    margin: 15px 0 22px;
+    border-radius: 14px;
+  }
+
+  .ItemContent h2 {
+    font-size: 23px;
+  }
+
+  .ItemContent p {
+    font-size: 14px;
+    line-height: 1.7;
+  }
 }
 
 

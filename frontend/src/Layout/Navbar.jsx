@@ -290,7 +290,7 @@ function Navbar() {
 
                   <button
                     type="button"
-                    className="logout-btn"
+                    className="btn-outline-theme-primary w-100 mb-2"
                     onClick={() => { setProfileOpen(false); navigate("/MyAccount"); }}
                   >
                     My Account · {Number(user?.coins || 0)} Coins
@@ -298,11 +298,21 @@ function Navbar() {
 
                   <button
                     type="button"
-                    className="logout-btn"
+                    className="btn-outline-theme-primary w-100 mb-2"
                     onClick={() => { setProfileOpen(false); navigate("/MyOrders"); }}
                   >
                     My Orders
-                  </button>
+                  </button> 
+
+                  {user?.role === "admin" && (
+                    <button
+                      type="button"
+                      className="btn-outline-theme-primary w-100 mb-2"
+                      onClick={() => { setProfileOpen(false); navigate("/AdminDashboard"); }}
+                    >
+                      Admin Dashboard
+                    </button>
+                  )}
 
                   <hr />
 
@@ -311,13 +321,14 @@ function Navbar() {
 
                   <button
                     type="button"
-                    className="logout-btn"
+                    className="btn-subtle-theme-danger w-100 mb-2"
                     onClick={handleLogout}
                   >
 
                     Logout
 
                   </button>
+                  
 
 
                 </div>
