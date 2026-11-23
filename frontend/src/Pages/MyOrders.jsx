@@ -624,10 +624,13 @@ const MyOrders = () => {
                       </small>
 
                       <strong>
-                        {order.shippingDetails
+                        {order.paymentMethod || order.shippingDetails
                           ?.paymentMethod ||
                           "Cash on Delivery"}
                       </strong>
+                      <small className="text-muted d-block">
+                        {order.paymentStatus === "PAID" ? "Paid" : order.paymentStatus === "COD_PENDING" ? "Pay on delivery" : order.paymentStatus || "Payment pending"}
+                      </small>
 
                     </div>
 
@@ -887,10 +890,14 @@ const MyOrders = () => {
                         Payment:{" "}
 
                         <strong>
-                          {order.shippingDetails
+                          {order.paymentMethod || order.shippingDetails
                             ?.paymentMethod ||
                             "Cash on Delivery"}
                         </strong>
+                        <br />
+                        <small className={order.paymentStatus === "PAID" ? "text-success" : "text-muted"}>
+                          {order.paymentStatus === "PAID" ? "Payment successful" : order.paymentStatus === "COD_PENDING" ? "Pay on delivery" : order.paymentStatus || "Payment pending"}
+                        </small>
 
                       </p>
 

@@ -1,160 +1,81 @@
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from "react-router-dom";
+import MainLayout from "../Layout/MainLayout.jsx";
+import "../Style/OrderConfirmation.css";
 
-const OrderPage = () => {
-  const location = useLocation();
+function OrderPage() {
+  const { state } = useLocation();
   const navigate = useNavigate();
+  const order = state?.order;
 
-  // Route state se order details receive karein
-  const orderDetails = location.state;
-
-  if (!orderDetails) {
+  if (!order) {
     return (
-      <div style={{ padding: '50px', textAlign: 'center' }}>
-        <h2>Koi Order Status Nahi Mila!</h2>
-        <button 
-          onClick={() => navigate('/')} 
-          style={{ padding: '10px 20px', marginTop: '15px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-        >
-          Continue Shopping
-        </button>
-      </div>
+      <MainLayout>
+        <main className="order-confirmation empty-confirmation">
+          <h2>No recent order details found</h2>
+          <p>You can view placed orders from your account.</p>
+          <button type="button" onClick={() => navigate("/MyOrders")}>View my orders</button>
+          <button type="button" className="secondary-confirmation-button" onClick={() => navigate("/")}>Continue shopping</button>
+        </main>
+      </MainLayout>
     );
   }
 
-  const {
-    orderId = `ORD${Math.floor(100000 + Math.random() * 900000)}`,
-    orderDate,
-    orderTime,
-    product,
-    quantity = 1,
-    totalAmount,
-    originalAmount,
-    coinsUsed = 0,
-    coinsEarned = 0,
-    shippingDetails
-  } = orderDetails;
+  const isPaid = order.paymentStatus === "PAID";
+  const items = Array.isArray(order.items) ? order.items : [];
+  const formatMoney = (value) => `₹${Number(value || 0).toLocaleString("en-IN")}`;
+  const createdAt = order.createdAt ? new Date(order.createdAt) : new Date();
 
   return (
-    <div style={{ maxWidth: '800px', margin: '30px auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      
-      {/* 1. SUCCESS BANNER (Amazon / Flipkart Style) */}
-      <div style={{ backgroundColor: '#e6f4ea', border: '1px solid #a8dab5', padding: '20px', borderRadius: '8px', textAlign: 'center', marginBottom: '25px' }}>
-        <div style={{ fontSize: '40px', color: '#28a745' }}>✓</div>
-        <h2 style={{ color: '#1e7e34', margin: '10px 0 5px 0' }}>Order Confirmed!</h2>
-        <p style={{ margin: 0, color: '#555' }}>
-          Thank you for your order. We have received your order and are processing it.
-        </p>
-        <p style={{ marginTop: '8px', fontWeight: 'bold', fontSize: '15px' }}>
-          🪙 You earned {coinsEarned} SHIVRAM Coins (₹{coinsEarned} wallet value)!
-        </p>
-        <p style={{ marginTop: '8px', fontWeight: 'bold', fontSize: '15px' }}>
-          Order ID: <span style={{ color: '#007bff' }}>#{orderId}</span>
-        </p>
-      </div>
+    <MainLayout>
+      <main className="order-confirmation">
+        <section className="confirmation-hero">
+          <div className="confirmation-check">✓</div>
+          <p className="confirmation-eyebrow">SHIVRAM ORDER CONFIRMATION</p>
+          <h1>Thank you for your order!</h1>
+          <p>{isPaid ? "Your payment has been verified and your order is confirmed." : "Your Cash on Delivery order has been placed successfully."}</p>
+          <div className="confirmation-order-id">Order ID <strong>{order.orderId}</strong></div>
+          <span className={`payment-status-pill ${isPaid ? "paid" : "cod"}`}>{isPaid ? "Payment successful" : "Cash on Delivery"}</span>
+        </section>
 
-      {/* 2. ORDER TRACKING STATUS BAR */}
-      <div style={{ border: '1px solid #e0e0e0', padding: '20px', borderRadius: '8px', marginBottom: '25px', backgroundColor: '#fafafa' }}>
-        <h4 style={{ marginTop: 0, marginBottom: '20px', color: '#333' }}>Order Status</h4>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-          
-          {/* Status Step 1 */}
-          <div style={{ textAlign: 'center', flex: 1, zIndex: 1 }}>
-            <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#28a745', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontWeight: 'bold' }}>✓</div>
-            <p style={{ fontSize: '13px', fontWeight: 'bold', margin: '5px 0 0 0', color: '#28a745' }}>Order Placed</p>
-            <p style={{ fontSize: '11px', color: '#777', margin: 0 }}>{orderDate} ({orderTime})</p>
-          </div>
+        <div className="confirmation-grid">
+          <section className="confirmation-card">
+            <div className="confirmation-card-heading"><h2>Items ordered</h2><span>{items.length} product(s)</span></div>
+            {items.map((item) => (
+              <div className="confirmed-item" key={item.productId}>
+                <img src={item.image} alt={item.title} />
+                <div className="confirmed-item-info"><strong>{item.title}</strong><small>Quantity: {item.quantity}</small><small>Unit price: {formatMoney(item.price)}</small></div>
+                <b>{formatMoney(Number(item.price) * Number(item.quantity))}</b>
+              </div>
+            ))}
+            <div className="confirmed-total"><span>Amount paid / payable</span><strong>{formatMoney(order.totalAmount)}</strong></div>
+            {Number(order.coinsUsed) > 0 && <p className="confirmed-coins">SHIVRAM Coins redeemed: {order.coinsUsed} (−{formatMoney(order.coinsUsed)})</p>}
+            {Number(order.coinsEarned) > 0 && <p className="confirmed-coins">Coins earned: {order.coinsEarned}</p>}
+          </section>
 
-          {/* Line */}
-          <div style={{ height: '3px', backgroundColor: '#e0e0e0', flex: 1, marginTop: '-15px' }}></div>
-
-          {/* Status Step 2 */}
-          <div style={{ textAlign: 'center', flex: 1, zIndex: 1 }}>
-            <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#ff9f00', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontWeight: 'bold' }}>2</div>
-            <p style={{ fontSize: '13px', fontWeight: 'bold', margin: '5px 0 0 0', color: '#ff9f00' }}>Processing</p>
-            <p style={{ fontSize: '11px', color: '#777', margin: 0 }}>Packed Soon</p>
-          </div>
-
-          {/* Line */}
-          <div style={{ height: '3px', backgroundColor: '#e0e0e0', flex: 1, marginTop: '-15px' }}></div>
-
-          {/* Status Step 3 */}
-          <div style={{ textAlign: 'center', flex: 1, zIndex: 1 }}>
-            <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#ccc', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontWeight: 'bold' }}>3</div>
-            <p style={{ fontSize: '13px', margin: '5px 0 0 0', color: '#777' }}>Shipped</p>
-          </div>
-
-          {/* Line */}
-          <div style={{ height: '3px', backgroundColor: '#e0e0e0', flex: 1, marginTop: '-15px' }}></div>
-
-          {/* Status Step 4 */}
-          <div style={{ textAlign: 'center', flex: 1, zIndex: 1 }}>
-            <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#ccc', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontWeight: 'bold' }}>4</div>
-            <p style={{ fontSize: '13px', margin: '5px 0 0 0', color: '#777' }}>Delivered</p>
-          </div>
-
-        </div>
-      </div>
-
-      {/* 3. PRODUCT & DELIVERY DETAILS */}
-      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-        
-        {/* Left: Product Information */}
-        <div style={{ flex: '1 1 350px', border: '1px solid #e0e0e0', padding: '20px', borderRadius: '8px' }}>
-          <h4 style={{ marginTop: 0, borderBottom: '1px solid #eee', paddingBottom: '10px' }}>Item Ordered</h4>
-          <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
-            {product?.image && (
-              <img 
-                src={product.image} 
-                alt={product.title || product.name} 
-                style={{ width: '90px', height: '90px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #eee' }} 
-              />
-            )}
-            <div>
-              <h4 style={{ margin: '0 0 5px 0', fontSize: '16px' }}>{product?.title || product?.name}</h4>
-              <p style={{ margin: '3px 0', fontSize: '14px', color: '#555' }}>Quantity: <strong>{quantity}</strong></p>
-              <p style={{ margin: '3px 0', fontSize: '14px', color: '#555' }}>Price: ₹{product?.price}</p>
-              {coinsUsed > 0 && <p style={{ margin: '8px 0 0 0', fontSize: '14px', color: '#198754' }}>SHIVRAM Coins used: {coinsUsed} (−₹{coinsUsed})</p>}
-              {originalAmount != null && coinsUsed > 0 && <p style={{ margin: '3px 0', fontSize: '14px', color: '#555' }}>Original total: ₹{originalAmount}</p>}
-              <p style={{ margin: '8px 0 0 0', fontSize: '16px', fontWeight: 'bold', color: '#28a745' }}>
-                Amount Payable: ₹{totalAmount}
-              </p>
+          <section className="confirmation-card">
+            <h2>Delivery details</h2>
+            <div className="delivery-details">
+              <strong>{order.shippingDetails?.fullName}</strong>
+              <p>{order.shippingDetails?.address}</p>
+              <p>{order.shippingDetails?.city}, {order.shippingDetails?.state} – {order.shippingDetails?.pincode}</p>
+              <p>Phone: {order.shippingDetails?.phone}</p>
             </div>
-          </div>
+            <h2 className="payment-detail-heading">Payment details</h2>
+            <div className="payment-detail-row"><span>Method</span><strong>{order.paymentMethod || order.shippingDetails?.paymentMethod || "Cash on Delivery"}</strong></div>
+            <div className="payment-detail-row"><span>Status</span><strong>{isPaid ? "Paid" : "Pay on delivery"}</strong></div>
+            {order.razorpayPaymentId && <div className="payment-detail-row"><span>Payment reference</span><strong className="reference-id">{order.razorpayPaymentId}</strong></div>}
+            <div className="payment-detail-row"><span>Order date</span><strong>{createdAt.toLocaleString("en-IN")}</strong></div>
+            <div className="payment-detail-row"><span>Order status</span><strong>{order.orderStatus || "Order Placed"}</strong></div>
+          </section>
         </div>
 
-        {/* Right: Delivery Address & Payment Method */}
-        <div style={{ flex: '1 1 300px', border: '1px solid #e0e0e0', padding: '20px', borderRadius: '8px', backgroundColor: '#fafafa' }}>
-          <h4 style={{ marginTop: 0, borderBottom: '1px solid #eee', paddingBottom: '10px' }}>Delivery Address</h4>
-          {shippingDetails ? (
-            <div style={{ fontSize: '14px', lineHeight: '1.6', color: '#333' }}>
-              <p style={{ margin: '0', fontWeight: 'bold' }}>{shippingDetails.fullName}</p>
-              <p style={{ margin: '0' }}>{shippingDetails.address}</p>
-              <p style={{ margin: '0' }}>{shippingDetails.city} - {shippingDetails.pincode}</p>
-              <p style={{ margin: '5px 0 0 0' }}><strong>Phone:</strong> {shippingDetails.phone}</p>
-              <p style={{ margin: '10px 0 0 0', padding: '6px', backgroundColor: '#fff3cd', border: '1px solid #ffeeba', borderRadius: '4px', fontSize: '13px', display: 'inline-block' }}>
-                <strong>Payment Mode:</strong> {shippingDetails.paymentMethod || 'Cash on Delivery'}
-              </p>
-            </div>
-          ) : (
-            <p style={{ color: '#777', fontSize: '14px' }}>Cash on Delivery selected.</p>
-          )}
+        <div className="confirmation-actions">
+          <button type="button" onClick={() => navigate("/MyOrders")}>Track / view orders</button>
+          <button type="button" className="secondary-confirmation-button" onClick={() => navigate("/")}>Continue shopping</button>
         </div>
-
-      </div>
-
-      {/* 4. HOME BUTTON */}
-      <div style={{ marginTop: '30px', textAlign: 'center' }}>
-        <button 
-          onClick={() => navigate('/')} 
-          style={{ padding: '12px 30px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '5px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
-        >
-          Continue Shopping
-        </button>
-      </div>
-
-    </div>
+      </main>
+    </MainLayout>
   );
-};
+}
 
 export default OrderPage;

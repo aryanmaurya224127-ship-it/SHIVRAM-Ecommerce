@@ -1,201 +1,367 @@
-
 const express = require("express");
-const router = express.Router();
-
+const crypto = require("crypto");
+const Product = require("../Models/Product");
 const Order = require("../Models/Order");
 const User = require("../Models/User");
-const {
-  authenticateToken,
-  requireAdmin,
-} = require("../Middleware/auth");
+const { authenticateToken } = require("../Middleware/auth");
 
-// =========================================
-// CREATE ORDER
-// =========================================
-router.post("/", authenticateToken, async (req, res) => {
-  let coinsDeducted = 0;
-  let userIdForRollback = null;
+const router = express.Router();
+const RAZORPAY_API = "https://api.razorpay.com/v1";
 
+function razorpayConfigured() {
+  return Boolean(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
+}
+
+function validateShippingDetails(details) {
+  if (!details || typeof details !== "object") return "Delivery address is required.";
+  const fullName = String(details.fullName || "").trim();
+  const phone = String(details.phone || "").trim();
+  const address = String(details.address || "").trim();
+  const city = String(details.city || "").trim();
+  const state = String(details.state || "").trim();
+  const pincode = String(details.pincode || "").trim();
+
+  if (fullName.length < 2) return "Enter a valid full name.";
+  if (!/^[6-9]\d{9}$/.test(phone)) return "Enter a valid 10-digit Indian mobile number.";
+  if (address.length < 5) return "Enter a complete delivery address.";
+  if (!city || !state) return "City and state are required.";
+  if (!/^\d{6}$/.test(pincode)) return "Enter a valid 6-digit PIN code.";
+  return null;
+}
+
+async function calculateCheckout(userId, body) {
+  const validationError = validateShippingDetails(body.shippingDetails);
+  if (validationError) {
+    const error = new Error(validationError);
+    error.status = 400;
+    throw error;
+  }
+
+  if (!Array.isArray(body.items) || body.items.length === 0) {
+    const error = new Error("Your cart is empty.");
+    error.status = 400;
+    throw error;
+  }
+
+  const normalized = new Map();
+  for (const item of body.items) {
+    const productId = Number(item.productId);
+    const quantity = Number(item.quantity);
+    if (!Number.isInteger(productId) || !Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
+      const error = new Error("One or more product quantities are invalid (1–20 allowed).");
+      error.status = 400;
+      throw error;
+    }
+    normalized.set(productId, (normalized.get(productId) || 0) + quantity);
+  }
+
+  const productIds = [...normalized.keys()];
+  const products = await Product.find({ productId: { $in: productIds } }).lean();
+  const productMap = new Map(products.map((product) => [Number(product.productId), product]));
+
+  if (products.length !== productIds.length) {
+    const error = new Error("One or more products are no longer available.");
+    error.status = 400;
+    throw error;
+  }
+
+  const items = productIds.map((productId) => {
+    const product = productMap.get(productId);
+    const quantity = normalized.get(productId);
+    const listedPrice = Number(product.Price);
+    const discount = Math.min(100, Math.max(0, Number(product.Discount) || 0));
+    const unitPrice = Math.max(0, Math.round(listedPrice * (1 - discount / 100)));
+    return {
+      productId,
+      title: product.CardTitle,
+      image: product.image || "",
+      price: unitPrice,
+      quantity,
+    };
+  });
+
+  const originalAmount = items.reduce((sum, item) => {
+    const product = productMap.get(item.productId);
+    return sum + Math.round(Number(product.Price) || 0) * item.quantity;
+  }, 0);
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const discountAmount = Math.max(0, originalAmount - subtotal);
+  const user = await User.findById(userId).select("coins name email phone");
+  if (!user) {
+    const error = new Error("User account not found. Please sign in again.");
+    error.status = 401;
+    throw error;
+  }
+
+  const coinsToUse = Number(body.coinsToUse || 0);
+  if (!Number.isInteger(coinsToUse) || coinsToUse < 0) {
+    const error = new Error("Wallet coins amount is invalid.");
+    error.status = 400;
+    throw error;
+  }
+  if (coinsToUse > Number(user.coins || 0)) {
+    const error = new Error("You do not have enough SHIVRAM Coins.");
+    error.status = 400;
+    throw error;
+  }
+  if (coinsToUse > subtotal) {
+    const error = new Error("Wallet coins cannot exceed the order subtotal.");
+    error.status = 400;
+    throw error;
+  }
+
+  const payableAmount = subtotal - coinsToUse;
+  return {
+    user,
+    items,
+    originalAmount,
+    subtotal,
+    discountAmount,
+    coinsUsed: coinsToUse,
+    payableAmount,
+    coinsEarned: Math.floor(payableAmount * 0.05),
+    shippingDetails: {
+      fullName: String(body.shippingDetails.fullName).trim(),
+      phone: String(body.shippingDetails.phone).trim(),
+      address: String(body.shippingDetails.address).trim(),
+      city: String(body.shippingDetails.city).trim(),
+      state: String(body.shippingDetails.state).trim(),
+      pincode: String(body.shippingDetails.pincode).trim(),
+      paymentMethod: body.shippingDetails.paymentMethod || "",
+    },
+  };
+}
+
+async function saveOrder(userId, checkout, payment) {
+  if (payment.razorpayPaymentId) {
+    const existing = await Order.findOne({ razorpayPaymentId: payment.razorpayPaymentId });
+    if (existing) {
+      const currentWallet = await User.findById(userId).select("coins");
+      return { order: existing, coinsEarned: existing.coinsEarned || 0, walletCoins: currentWallet?.coins || 0, alreadyCreated: true };
+    }
+  }
+
+  const walletDelta = checkout.coinsEarned - checkout.coinsUsed;
+  let walletUpdated = false;
   try {
-    // User identity token se li jayegi, request body se nahi.
-    const userId = req.user._id;
-    const { items, totalAmount, shippingDetails } = req.body;
-    const coinsToUse = Number(req.body.coinsToUse || 0);
-
-    if (
-      !Array.isArray(items) ||
-      items.length === 0 ||
-      !Number.isFinite(Number(totalAmount)) ||
-      Number(totalAmount) < 0 ||
-      !shippingDetails
-    ) {
-      return res.status(400).json({
-        message: "Order details incomplete hain",
-      });
-    }
-
-    if (!Number.isInteger(coinsToUse) || coinsToUse < 0) {
-      return res.status(400).json({
-        message: "Coins amount valid nahi hai.",
-      });
-    }
-
-    const originalAmount = Math.round(Number(totalAmount));
-    const actualCoinsToUse = Math.min(coinsToUse, originalAmount);
-
-    const orderId =
-      "ORD" + Date.now() + Math.floor(Math.random() * 1000);
-
-    if (actualCoinsToUse > 0) {
-      const updatedUser = await User.findOneAndUpdate(
-        {
-          _id: userId,
-          coins: { $gte: actualCoinsToUse },
-        },
-        {
-          $inc: { coins: -actualCoinsToUse },
-        },
-        { new: true }
-      );
-
-      if (!updatedUser) {
-        return res.status(400).json({
-          message: "Aapke wallet mein itne coins available nahi hain.",
-        });
-      }
-
-      coinsDeducted = actualCoinsToUse;
-      userIdForRollback = userId;
-    }
-
-    const payableAmount = Math.max(
-      0,
-      originalAmount - actualCoinsToUse
+    // Redeem and award coins in one atomic update to avoid concurrent overspending.
+    const walletFilter = checkout.coinsUsed > 0
+      ? { _id: userId, coins: { $gte: checkout.coinsUsed } }
+      : { _id: userId, $or: [{ coins: { $gte: 0 } }, { coins: { $exists: false } }, { coins: null }] };
+    const updatedUser = await User.findOneAndUpdate(
+      walletFilter,
+      { $inc: { coins: walletDelta } },
+      { new: true }
     );
+    if (!updatedUser) {
+      const error = new Error("Wallet balance changed. Refresh checkout and try again.");
+      error.status = 409;
+      throw error;
+    }
+    walletUpdated = true;
 
-    const coinsEarned = Math.floor(payableAmount * 0.05);
-
-    const newOrder = new Order({
-      orderId,
+    const order = await Order.create({
+      orderId: `ORD${Date.now()}${crypto.randomInt(100, 999)}`,
       userId,
-      items,
-      totalAmount: payableAmount,
-      originalAmount,
-      coinsUsed: actualCoinsToUse,
-      coinsEarned,
-      shippingDetails,
+      items: checkout.items,
+      totalAmount: checkout.payableAmount,
+      originalAmount: checkout.originalAmount,
+      discountAmount: checkout.discountAmount,
+      coinsUsed: checkout.coinsUsed,
+      coinsEarned: checkout.coinsEarned,
+      shippingDetails: {
+        ...checkout.shippingDetails,
+        paymentMethod: payment.paymentMethod,
+      },
       orderStatus: "Order Placed",
+      paymentStatus: payment.paymentStatus,
+      paymentProvider: payment.paymentProvider,
+      paymentMethod: payment.paymentMethod,
+      razorpayOrderId: payment.razorpayOrderId || "",
+      ...(payment.razorpayPaymentId ? { razorpayPaymentId: payment.razorpayPaymentId } : {}),
+      currency: "INR",
     });
 
-    const savedOrder = await newOrder.save();
+    return { order, coinsEarned: checkout.coinsEarned, walletCoins: updatedUser.coins || 0, alreadyCreated: false };
+  } catch (error) {
+    if (walletUpdated) {
+      await User.findByIdAndUpdate(userId, { $inc: { coins: -walletDelta } }).catch((rollbackError) => {
+        console.error("Wallet rollback failed:", rollbackError.message);
+      });
+    }
+    throw error;
+  }
+}
 
-    if (coinsEarned > 0) {
-      await User.findByIdAndUpdate(userId, {
-        $inc: { coins: coinsEarned },
+async function razorpayRequest(path, method = "GET", body) {
+  const auth = Buffer.from(`${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`).toString("base64");
+  const response = await fetch(`${RAZORPAY_API}${path}`, {
+    method,
+    headers: {
+      Authorization: `Basic ${auth}`,
+      "Content-Type": "application/json",
+    },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(data?.error?.description || "Payment gateway request failed.");
+    error.status = response.status >= 400 && response.status < 500 ? 400 : 502;
+    throw error;
+  }
+  return data;
+}
+
+// Create an online payment intent. Product prices are always read from MongoDB.
+router.post("/checkout/razorpay/create", authenticateToken, async (req, res) => {
+  try {
+    const checkout = await calculateCheckout(req.user._id, req.body);
+
+    // Wallet can cover the complete order; no gateway call is needed.
+    if (checkout.payableAmount === 0) {
+      const saved = await saveOrder(req.user._id, checkout, {
+        paymentStatus: "PAID",
+        paymentProvider: "SHIVRAM_WALLET",
+        paymentMethod: "SHIVRAM Coins",
+      });
+      return res.status(201).json({ success: true, completed: true, ...saved });
+    }
+
+    if (!razorpayConfigured()) {
+      return res.status(503).json({
+        success: false,
+        message: "Online payments are not configured. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to backend/.env, or choose Cash on Delivery.",
       });
     }
 
-    const updatedWallet = await User.findById(userId).select("coins");
+    const gatewayOrder = await razorpayRequest("/orders", "POST", {
+      amount: checkout.payableAmount * 100,
+      currency: "INR",
+      receipt: `shivram_${Date.now()}`,
+      notes: {
+        userId: String(req.user._id),
+        itemCount: String(checkout.items.length),
+      },
+    });
 
     return res.status(201).json({
-      message: "Order successfully save ho gaya",
-      order: savedOrder,
-      coinsEarned,
-      coinsUsed: actualCoinsToUse,
-      walletCoins: updatedWallet?.coins || 0,
-      messageCoins: `${coinsEarned} SHIVRAM Coins earned; ${actualCoinsToUse} coins used.`,
+      success: true,
+      completed: false,
+      keyId: process.env.RAZORPAY_KEY_ID,
+      gatewayOrder: {
+        id: gatewayOrder.id,
+        amount: gatewayOrder.amount,
+        currency: gatewayOrder.currency,
+      },
+      summary: {
+        originalAmount: checkout.originalAmount,
+        discountAmount: checkout.discountAmount,
+        subtotal: checkout.subtotal,
+        coinsUsed: checkout.coinsUsed,
+        payableAmount: checkout.payableAmount,
+      },
     });
   } catch (error) {
-    if (coinsDeducted > 0 && userIdForRollback) {
-      try {
-        await User.findByIdAndUpdate(userIdForRollback, {
-          $inc: { coins: coinsDeducted },
-        });
-      } catch (rollbackError) {
-        console.error("Coin rollback failed:", rollbackError.message);
-      }
-    }
-
-    console.error("Create Order Error:", error.message);
-
-    return res.status(500).json({
-      message: "Order save nahi ho paya",
-      error: error.message,
-    });
+    console.error("Create Razorpay order error:", error.message);
+    return res.status(error.status || 500).json({ success: false, message: error.message || "Unable to start payment." });
   }
 });
 
-// =========================================
-// GET USER COIN WALLET
-// =========================================
-router.get(
-  "/wallet/:userId",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      const requestedUserId = req.params.userId;
-      const isAdmin = req.user.role === "admin";
-      const isOwnWallet =
-        req.user._id.toString() === requestedUserId;
-
-      if (!isAdmin && !isOwnWallet) {
-        return res.status(403).json({
-          message: "You cannot access another user's wallet",
-        });
-      }
-
-      const user = await User.findById(requestedUserId).select("coins");
-
-      if (!user) {
-        return res.status(404).json({
-          message: "User nahi mila",
-        });
-      }
-
-      return res.json({
-        coins: user.coins || 0,
-        coinValueInRupees: 1,
-      });
-    } catch (error) {
-      return res.status(400).json({
-        message: "Wallet fetch nahi ho paya",
-      });
+// Verify Razorpay signature and gateway state before creating the order in MongoDB.
+router.post("/checkout/razorpay/verify", authenticateToken, async (req, res) => {
+  try {
+    if (!razorpayConfigured()) return res.status(503).json({ message: "Razorpay is not configured." });
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ success: false, message: "Payment verification details are incomplete." });
     }
-  }
-);
 
-// =========================================
-// GET USER ORDERS
-// =========================================
-router.get(
-  "/user/:userId",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      const requestedUserId = req.params.userId;
-      const isAdmin = req.user.role === "admin";
-      const isOwnOrders =
-        req.user._id.toString() === requestedUserId;
-
-      if (!isAdmin && !isOwnOrders) {
-        return res.status(403).json({
-          message: "You cannot access another user's orders",
-        });
-      }
-
-      const orders = await Order.find({
-        userId: requestedUserId,
-      }).sort({ createdAt: -1 });
-
-      return res.json(orders);
-    } catch (error) {
-      console.error("Get Orders Error:", error.message);
-
-      return res.status(500).json({
-        message: "Orders fetch nahi ho paye",
-      });
+    const expected = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest("hex");
+    const expectedBuffer = Buffer.from(expected, "hex");
+    const receivedBuffer = Buffer.from(String(razorpay_signature), "hex");
+    if (expectedBuffer.length !== receivedBuffer.length || !crypto.timingSafeEqual(expectedBuffer, receivedBuffer)) {
+      return res.status(400).json({ success: false, message: "Payment signature verification failed." });
     }
+
+    const [gatewayOrder, payment] = await Promise.all([
+      razorpayRequest(`/orders/${encodeURIComponent(razorpay_order_id)}`),
+      razorpayRequest(`/payments/${encodeURIComponent(razorpay_payment_id)}`),
+    ]);
+    if (String(gatewayOrder.notes?.userId) !== String(req.user._id)) {
+      return res.status(403).json({ success: false, message: "This payment does not belong to your account." });
+    }
+    if (payment.order_id !== razorpay_order_id || payment.status !== "captured" || gatewayOrder.status !== "paid") {
+      return res.status(400).json({ success: false, message: "Payment has not been captured successfully." });
+    }
+
+    const checkout = await calculateCheckout(req.user._id, req.body);
+    if (Number(gatewayOrder.amount) !== checkout.payableAmount * 100 || payment.currency !== "INR") {
+      return res.status(400).json({ success: false, message: "Paid amount does not match the current order total. Contact support before retrying." });
+    }
+
+    const saved = await saveOrder(req.user._id, checkout, {
+      paymentStatus: "PAID",
+      paymentProvider: "RAZORPAY",
+      paymentMethod: payment.method ? `Razorpay (${payment.method.toUpperCase()})` : "Razorpay",
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+    });
+
+    return res.status(201).json({ success: true, ...saved });
+  } catch (error) {
+    console.error("Verify Razorpay payment error:", error.message);
+    return res.status(error.status || 500).json({ success: false, message: error.message || "Payment verification failed." });
   }
-);
+});
+
+// Cash on Delivery does not require a payment gateway.
+router.post("/checkout/cod", authenticateToken, async (req, res) => {
+  try {
+    const checkout = await calculateCheckout(req.user._id, req.body);
+    const isFullyCoveredByCoins = checkout.payableAmount === 0;
+    const saved = await saveOrder(req.user._id, checkout, {
+      paymentStatus: isFullyCoveredByCoins ? "PAID" : "COD_PENDING",
+      paymentProvider: isFullyCoveredByCoins ? "SHIVRAM_WALLET" : "COD",
+      paymentMethod: isFullyCoveredByCoins ? "SHIVRAM Coins" : "Cash on Delivery",
+    });
+    return res.status(201).json({ success: true, ...saved });
+  } catch (error) {
+    console.error("Create COD order error:", error.message);
+    return res.status(error.status || 500).json({ success: false, message: error.message || "Unable to place COD order." });
+  }
+});
+
+// Wallet balance
+router.get("/wallet/:userId", authenticateToken, async (req, res) => {
+  try {
+    const requestedUserId = req.params.userId;
+    if (req.user.role !== "admin" && String(req.user._id) !== requestedUserId) {
+      return res.status(403).json({ message: "You cannot access another user's wallet." });
+    }
+    const user = await User.findById(requestedUserId).select("coins");
+    if (!user) return res.status(404).json({ message: "User not found." });
+    return res.json({ coins: user.coins || 0, coinValueInRupees: 1 });
+  } catch (error) {
+    return res.status(500).json({ message: "Wallet could not be loaded." });
+  }
+});
+
+// User order history
+router.get("/user/:userId", authenticateToken, async (req, res) => {
+  try {
+    const requestedUserId = req.params.userId;
+    if (req.user.role !== "admin" && String(req.user._id) !== requestedUserId) {
+      return res.status(403).json({ message: "You cannot access another user's orders." });
+    }
+    const orders = await Order.find({ userId: requestedUserId }).sort({ createdAt: -1 });
+    return res.json(orders);
+  } catch (error) {
+    console.error("Get orders error:", error.message);
+    return res.status(500).json({ message: "Orders could not be loaded." });
+  }
+});
 
 module.exports = router;

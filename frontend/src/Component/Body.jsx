@@ -16,9 +16,12 @@ import Register from "../Pages/Register.jsx";
 import ForgotPassword  from "../Pages/ForgoyPassword.jsx";
 import OrderPage from '../Pages/OrderPage.jsx';
 import MyOrders from '../Pages/MyOrders.jsx';
-import MyAccount from '../Pages/MyAccount.jsx';
 import AdminDashboard from "../Pages/AdminDashboard.jsx";
+import OrderTrack from "../Pages/OrderTrack.jsx";
+
 import AdminRoute from "./AdminRoute.jsx";
+import MyAccount from '../Pages/MyAccount.jsx';
+import CheckoutPage from '../Pages/CheckoutPage.jsx';
 
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -44,9 +47,12 @@ function Body() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/BuyButton" element={<BuyButton />} />
         <Route path="/order" element={<OrderPage />} />
+        <Route path="/Checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
         <Route path="/MyOrders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
-        <Route path="/MyAccount" element={<ProtectedRoute><MyAccount /></ProtectedRoute>} />
+        <Route path="/OrderTrack" element={<ProtectedRoute><OrderTrack /></ProtectedRoute>} />
         <Route path="/AdminDashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+
+        <Route path="/MyAccount" element={<ProtectedRoute><MyAccount /></ProtectedRoute>} />
 
         {/* Protected Cart */}
         <Route  path="/Cart" element={<ProtectedRoute><Cart /></ProtectedRoute>}/>

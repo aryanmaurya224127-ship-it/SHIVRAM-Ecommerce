@@ -154,7 +154,7 @@ export default function MyAccount() {
             <p className="summary-label">Orders & Purchases</p>
             <div className="summary-value summary-word">Track your orders</div>
             <p className="summary-note">Check order details and delivery updates.</p>
-            <NavLink to="/MyOrders" className="account-text-link">View orders <span>→</span></NavLink>
+            <NavLink to="/OrderTrack" className="account-text-link">  Orders Track <span>→</span></NavLink>
           </article>
         </section>
 

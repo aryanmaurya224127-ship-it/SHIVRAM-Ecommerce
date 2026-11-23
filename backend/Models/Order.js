@@ -1,123 +1,49 @@
+
 const mongoose = require("mongoose");
 
-const orderItemSchema = new mongoose.Schema(
-  {
-    productId: {
-      type: Number,
-      required: true
-    },
+const orderItemSchema = new mongoose.Schema({
+  productId: { type: Number, required: true },
+  title: { type: String, required: true, trim: true },
+  image: { type: String, default: "" },
+  price: { type: Number, required: true, min: 0 },
+  quantity: { type: Number, required: true, min: 1 },
+}, { _id: false });
 
-    title: {
-      type: String,
-      required: true
-    },
-
-    image: {
-      type: String,
-      default: ""
-    },
-
-    price: {
-      type: Number,
-      required: true
-    },
-
-    quantity: {
-      type: Number,
-      required: true,
-      default: 1
-    }
+const orderSchema = new mongoose.Schema({
+  orderId: { type: String, required: true, unique: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
+  items: { type: [orderItemSchema], required: true, validate: [(items) => items.length > 0, "Order must contain at least one item"] },
+  totalAmount: { type: Number, required: true, min: 0 },
+  originalAmount: { type: Number, required: true, min: 0 },
+  discountAmount: { type: Number, default: 0, min: 0 },
+  coinsEarned: { type: Number, default: 0, min: 0 },
+  coinsUsed: { type: Number, default: 0, min: 0 },
+  shippingDetails: {
+    fullName: { type: String, required: true, trim: true },
+    phone: { type: String, required: true, trim: true },
+    address: { type: String, required: true, trim: true },
+    city: { type: String, required: true, trim: true },
+    state: { type: String, default: "" },
+    pincode: { type: String, required: true, trim: true },
+    paymentMethod: { type: String, default: "Cash on Delivery" },
   },
-  { _id: false }
-);
-
-const orderSchema = new mongoose.Schema(
-  {
-    orderId: {
-      type: String,
-      required: true,
-      unique: true
-    },
-
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true
-    },
-
-    items: {
-      type: [orderItemSchema],
-      required: true
-    },
-
-    totalAmount: {
-      type: Number,
-      required: true
-    },
-
-    coinsEarned: {
-      type: Number,
-      default: 0,
-      min: 0
-    },
-
-    coinsUsed: {
-      type: Number,
-      default: 0,
-      min: 0
-    },
-
-    originalAmount: {
-      type: Number,
-      required: true,
-      min: 0
-    },
-
-    shippingDetails: {
-      fullName: {
-        type: String,
-        required: true
-      },
-
-      phone: {
-        type: String,
-        required: true
-      },
-
-      address: {
-        type: String,
-        required: true
-      },
-
-      city: {
-        type: String,
-        required: true
-      },
-
-      state: {
-        type: String,
-        default: ""
-      },
-
-      pincode: {
-        type: String,
-        required: true
-      },
-
-      paymentMethod: {
-        type: String,
-        default: "Cash on Delivery"
-      }
-    },
-
-    orderStatus: {
-      type: String,
-      default: "Order Placed"
-    }
+  orderStatus: {
+    type: String,
+    enum: ["Order Placed", "Processing", "Shipped", "Out for Delivery", "Delivered", "Cancelled"],
+    default: "Order Placed",
   },
-  {
-    timestamps: true
-  }
-);
+  paymentStatus: {
+    type: String,
+    enum: ["COD_PENDING", "PAID", "FAILED", "REFUNDED"],
+    default: "COD_PENDING",
+  },
+  paymentProvider: { type: String, enum: ["COD", "RAZORPAY", "SHIVRAM_WALLET"], default: "COD" },
+  paymentMethod: { type: String, default: "Cash on Delivery" },
+  razorpayOrderId: { type: String, default: "" },
+  razorpayPaymentId: { type: String, default: undefined },
+  currency: { type: String, default: "INR" },
+}, { timestamps: true });
+
+orderSchema.index({ razorpayPaymentId: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model("Order", orderSchema);

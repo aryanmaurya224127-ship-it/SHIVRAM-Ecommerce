@@ -355,6 +355,15 @@ function Cart() {
 
                     </div>
 
+                    <button
+                      type="button"
+                      className="btn btn-primary w-100 mt-3"
+                      onClick={() => navigate("/Checkout", { state: { fromCart: true } })}
+                      disabled={loading || cart.length === 0}
+                    >
+                      Proceed to Checkout
+                    </button>
+
                   </div>
 
                 </div>
