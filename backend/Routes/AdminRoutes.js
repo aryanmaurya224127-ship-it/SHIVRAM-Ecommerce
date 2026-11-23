@@ -2,6 +2,7 @@ const express = require("express");
 const Product = require("../Models/Product");
 const Order = require("../Models/Order");
 const User = require("../Models/User");
+const StoreSettings = require("../Models/StoreSettings");
 const { authenticateToken, requireAdmin } = require("../Middleware/auth");
 
 const router = express.Router();
@@ -15,6 +16,39 @@ const ORDER_STATUSES = [
 ];
 
 router.use(authenticateToken, requireAdmin);
+
+// Coin reward percentage applies to orders placed after the setting is saved.
+router.get("/settings/coin-reward", async (req, res) => {
+  try {
+    const settings = await StoreSettings.findOne({ key: "store" }).lean();
+    res.json({ coinRewardPercentage: settings?.coinRewardPercentage ?? 5 });
+  } catch (error) {
+    console.error("Load coin reward settings error:", error);
+    res.status(500).json({ message: "Coin reward settings load nahi ho payi." });
+  }
+});
+
+router.patch("/settings/coin-reward", async (req, res) => {
+  try {
+    const percentage = Number(req.body.coinRewardPercentage);
+    if (!Number.isFinite(percentage) || percentage < 0 || percentage > 20) {
+      return res.status(400).json({ message: "Reward percentage 0 se 20 ke beech hona chahiye." });
+    }
+    const settings = await StoreSettings.findOneAndUpdate(
+      { key: "store" },
+      { $set: { coinRewardPercentage: percentage }, $setOnInsert: { key: "store" } },
+      { new: true, upsert: true, runValidators: true }
+    );
+    res.json({
+      message: `Coin reward rate ${percentage}% save ho gaya. Ye sirf naye orders par apply hoga.`,
+      coinRewardPercentage: settings.coinRewardPercentage,
+    });
+  } catch (error) {
+    console.error("Save coin reward settings error:", error);
+    res.status(500).json({ message: "Coin reward settings save nahi ho payi." });
+  }
+});
+
 
 // Dashboard summary cards and recent orders.
 router.get("/summary", async (req, res) => {
@@ -154,19 +188,90 @@ router.get("/orders", async (req, res) => {
 
 router.patch("/orders/:orderId/status", async (req, res) => {
   try {
-    const { status } = req.body;
-    if (!ORDER_STATUSES.includes(status)) {
+    const { status, expectedDeliveryDate } = req.body;
+    if (status !== undefined && !ORDER_STATUSES.includes(status)) {
       return res.status(400).json({ message: "Order status valid nahi hai.", allowedStatuses: ORDER_STATUSES });
     }
-    const order = await Order.findOneAndUpdate(
-      { orderId: req.params.orderId },
-      { $set: { orderStatus: status } },
-      { new: true, runValidators: true }
-    ).populate("userId", "name email phone");
+    if (status === undefined && expectedDeliveryDate === undefined) {
+      return res.status(400).json({ message: "Status ya expected delivery date provide karein." });
+    }
+
+    const order = await Order.findOne({ orderId: req.params.orderId });
     if (!order) return res.status(404).json({ message: "Order nahi mila." });
-    res.json({ message: "Order status update ho gaya.", order });
+
+    let parsedExpectedDate;
+    if (expectedDeliveryDate !== undefined) {
+      if (typeof expectedDeliveryDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(expectedDeliveryDate)) {
+        return res.status(400).json({ message: "Expected delivery date valid format (YYYY-MM-DD) mein bhejein." });
+      }
+      parsedExpectedDate = new Date(`${expectedDeliveryDate}T12:00:00.000Z`);
+      if (Number.isNaN(parsedExpectedDate.getTime()) || parsedExpectedDate.toISOString().slice(0, 10) !== expectedDeliveryDate) {
+        return res.status(400).json({ message: "Expected delivery date valid nahi hai." });
+      }
+    }
+
+    const nextStatus = status ?? order.orderStatus;
+    if (order.orderStatus === "Cancelled" && nextStatus !== "Cancelled") {
+      return res.status(409).json({ message: "Cancelled order ko dobara process nahi kiya ja sakta." });
+    }
+    if (order.orderStatus === "Delivered" && nextStatus !== "Delivered") {
+      return res.status(409).json({ message: "Delivered order ka status reverse nahi kiya ja sakta." });
+    }
+
+    const fields = {};
+    if (status !== undefined) fields.orderStatus = nextStatus;
+    if (parsedExpectedDate) fields.expectedDeliveryDate = parsedExpectedDate;
+
+    let updatedOrder;
+    let coinsCreditedNow = 0;
+    const hasRewardSnapshot = Number.isFinite(order.coinRewardPercentage);
+
+    if (nextStatus === "Delivered" && hasRewardSnapshot && order.coinsCredited !== true) {
+      updatedOrder = await Order.findOneAndUpdate(
+        { _id: order._id, orderStatus: { $ne: "Cancelled" }, coinsCredited: { $ne: true } },
+        { $set: { ...fields, orderStatus: "Delivered", coinsCredited: true, coinsCreditedAt: new Date() } },
+        { new: true, runValidators: true }
+      );
+
+      if (updatedOrder) {
+        const reward = Math.max(0, Math.floor(Number(updatedOrder.coinsEarned) || 0));
+        if (reward > 0) {
+          const customer = await User.findByIdAndUpdate(
+            updatedOrder.userId,
+            { $inc: { coins: reward } },
+            { new: true }
+          );
+          if (!customer) {
+            await Order.updateOne(
+              { _id: updatedOrder._id, coinsCredited: true },
+              { $set: { coinsCredited: false }, $unset: { coinsCreditedAt: 1 } }
+            );
+            return res.status(404).json({ message: "Customer account nahi mila; reward credit nahi hua. Dobara try karein." });
+          }
+          coinsCreditedNow = reward;
+        }
+      } else {
+        updatedOrder = await Order.findById(order._id);
+      }
+    } else {
+      updatedOrder = await Order.findOneAndUpdate(
+        { _id: order._id },
+        { $set: fields },
+        { new: true, runValidators: true }
+      );
+    }
+
+    if (!updatedOrder) return res.status(404).json({ message: "Order nahi mila." });
+    const populatedOrder = await Order.findById(updatedOrder._id).populate("userId", "name email phone");
+    const message = coinsCreditedNow > 0
+      ? `Order delivered. ${coinsCreditedNow} SHIVRAM Coins customer wallet mein credit ho gaye.`
+      : nextStatus === "Delivered" && hasRewardSnapshot
+        ? "Order status updated. Reward pehle hi credit ho chuka hai ya reward 0 hai."
+        : "Order details update ho gayi.";
+    res.json({ message, order: populatedOrder, coinsCredited: coinsCreditedNow });
   } catch (error) {
-    res.status(500).json({ message: "Order status update nahi ho paya." });
+    console.error("Admin order update error:", error);
+    res.status(500).json({ message: "Order update nahi ho paya." });
   }
 });
 

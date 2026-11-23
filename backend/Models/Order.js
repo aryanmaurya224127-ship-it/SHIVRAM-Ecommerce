@@ -17,6 +17,12 @@ const orderSchema = new mongoose.Schema({
   originalAmount: { type: Number, required: true, min: 0 },
   discountAmount: { type: Number, default: 0, min: 0 },
   coinsEarned: { type: Number, default: 0, min: 0 },
+  // Reward percentage is snapshotted when the order is placed. Older orders
+  // intentionally have no percentage, so they are not credited a second time.
+  coinRewardPercentage: { type: Number, min: 0, max: 20 },
+  coinsCredited: { type: Boolean, default: false },
+  coinsCreditedAt: { type: Date, default: null },
+  expectedDeliveryDate: { type: Date },
   coinsUsed: { type: Number, default: 0, min: 0 },
   shippingDetails: {
     fullName: { type: String, required: true, trim: true },

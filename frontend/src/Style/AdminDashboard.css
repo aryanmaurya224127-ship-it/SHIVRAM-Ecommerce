@@ -4,3 +4,18 @@
 @media(max-width:1100px){.admin-shell{grid-template-columns:205px minmax(0,1fr)}.admin-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-main{padding:22px 18px}.admin-insight-card{flex-wrap:wrap}.admin-insight-card button{margin-left:48px}}
 @media(max-width:760px){.admin-shell{display:block}.admin-sidebar{min-height:0;padding:13px 12px}.admin-brand{padding:0 5px 12px}.admin-side-label,.admin-sidebar-bottom{display:none}.admin-side-nav{display:flex;overflow-x:auto;gap:6px;padding-bottom:2px}.admin-side-nav button{flex-shrink:0;padding:9px 11px;font-size:11px}.admin-nav-icon{font-size:15px}.admin-main{padding:19px 12px}.admin-topbar{align-items:flex-start}.admin-topbar h1{font-size:23px}.admin-live-dot{display:none}.admin-welcome{padding:20px}.admin-welcome h2{font-size:18px}.admin-stat-grid{gap:9px}.admin-stat-card{padding:14px}.admin-stat-card>strong{font-size:21px}.admin-stat-icon{width:32px;height:32px;margin-bottom:10px}.admin-panel-heading{padding:16px}.admin-list-actions{width:100%;flex-wrap:wrap}.admin-search{flex:1;min-width:140px}.admin-overview-bottom{grid-template-columns:1fr}.admin-insight-card button{margin-left:auto}.admin-footer{font-size:9px}.admin-form-row{grid-template-columns:1fr}.admin-product-modal form{padding:18px}.admin-product-modal>header{padding:18px}}
 @media(max-width:390px){.admin-stat-grid{grid-template-columns:1fr 1fr}.admin-stat-card>strong{font-size:18px}.admin-welcome-icon{display:none}.admin-refresh{padding:8px;font-size:10px}.admin-topbar h1{font-size:21px}}
+
+/* Delivery date editor and coin reward settings */
+.admin-date-editor{display:flex;align-items:center;gap:6px;min-width:220px}
+.admin-date-editor input{width:145px;border:1px solid #e1e5ee;border-radius:7px;padding:7px 6px;font:inherit;font-size:10px;color:#394257;background:#fff}
+.admin-date-editor button{border:0;border-radius:6px;background:#655bd8;color:#fff;padding:7px 9px;font-size:10px;font-weight:750}
+.admin-date-editor button:disabled{opacity:.4;cursor:not-allowed}
+.admin-settings-form{max-width:620px;margin:25px auto;padding:28px;background:#fff;border:1px solid #edf0f6;border-radius:14px;display:grid;gap:15px;box-shadow:0 3px 12px #26314c04}
+.admin-settings-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:14px;background:#fff5db;font-size:25px}
+.admin-settings-form h3{font-size:18px;color:#242d40;margin:0 0 7px;font-weight:800}
+.admin-settings-form p{font-size:12px;line-height:1.65;color:#7b8598;margin:0}
+.admin-settings-form label{display:grid;gap:7px;font-size:11px;font-weight:750;color:#4c566b}
+.admin-settings-form input{max-width:180px;border:1px solid #e0e4ee;border-radius:8px;padding:10px 12px;font:inherit;font-size:13px;color:#2d3548}
+.admin-settings-form>small{font-size:10px;color:#8c95a7}
+.admin-settings-form .admin-primary-button{justify-self:start}
+@media(max-width:760px){.admin-date-editor{min-width:205px}.admin-settings-form{margin:15px 0;padding:20px}}

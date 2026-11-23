@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const Product = require("../Models/Product");
 const Order = require("../Models/Order");
 const User = require("../Models/User");
+const StoreSettings = require("../Models/StoreSettings");
 const { authenticateToken } = require("../Middleware/auth");
 
 const router = express.Router();
@@ -111,6 +112,11 @@ async function calculateCheckout(userId, body) {
   }
 
   const payableAmount = subtotal - coinsToUse;
+  const storeSettings = await StoreSettings.findOne({ key: "store" }).lean();
+  const coinRewardPercentage = Number.isFinite(Number(storeSettings?.coinRewardPercentage))
+    ? Math.min(20, Math.max(0, Number(storeSettings.coinRewardPercentage)))
+    : 5;
+
   return {
     user,
     items,
@@ -119,7 +125,8 @@ async function calculateCheckout(userId, body) {
     discountAmount,
     coinsUsed: coinsToUse,
     payableAmount,
-    coinsEarned: Math.floor(payableAmount * 0.05),
+    coinRewardPercentage,
+    coinsEarned: Math.floor(payableAmount * coinRewardPercentage / 100),
     shippingDetails: {
       fullName: String(body.shippingDetails.fullName).trim(),
       phone: String(body.shippingDetails.phone).trim(),
@@ -141,24 +148,27 @@ async function saveOrder(userId, checkout, payment) {
     }
   }
 
-  const walletDelta = checkout.coinsEarned - checkout.coinsUsed;
+  // Redeem coins at checkout; reward coins stay pending until delivery.
   let walletUpdated = false;
+  let updatedUser = checkout.user;
   try {
-    // Redeem and award coins in one atomic update to avoid concurrent overspending.
-    const walletFilter = checkout.coinsUsed > 0
-      ? { _id: userId, coins: { $gte: checkout.coinsUsed } }
-      : { _id: userId, $or: [{ coins: { $gte: 0 } }, { coins: { $exists: false } }, { coins: null }] };
-    const updatedUser = await User.findOneAndUpdate(
-      walletFilter,
-      { $inc: { coins: walletDelta } },
-      { new: true }
-    );
-    if (!updatedUser) {
-      const error = new Error("Wallet balance changed. Refresh checkout and try again.");
-      error.status = 409;
-      throw error;
+    if (checkout.coinsUsed > 0) {
+      updatedUser = await User.findOneAndUpdate(
+        { _id: userId, coins: { $gte: checkout.coinsUsed } },
+        { $inc: { coins: -checkout.coinsUsed } },
+        { new: true }
+      );
+      if (!updatedUser) {
+        const error = new Error("Wallet balance changed. Refresh checkout and try again.");
+        error.status = 409;
+        throw error;
+      }
+      walletUpdated = true;
     }
-    walletUpdated = true;
+
+    const expectedDeliveryDate = new Date();
+    expectedDeliveryDate.setUTCDate(expectedDeliveryDate.getUTCDate() + 5);
+    expectedDeliveryDate.setUTCHours(12, 0, 0, 0);
 
     const order = await Order.create({
       orderId: `ORD${Date.now()}${crypto.randomInt(100, 999)}`,
@@ -169,6 +179,9 @@ async function saveOrder(userId, checkout, payment) {
       discountAmount: checkout.discountAmount,
       coinsUsed: checkout.coinsUsed,
       coinsEarned: checkout.coinsEarned,
+      coinRewardPercentage: checkout.coinRewardPercentage,
+      coinsCredited: false,
+      expectedDeliveryDate,
       shippingDetails: {
         ...checkout.shippingDetails,
         paymentMethod: payment.paymentMethod,
@@ -182,10 +195,15 @@ async function saveOrder(userId, checkout, payment) {
       currency: "INR",
     });
 
-    return { order, coinsEarned: checkout.coinsEarned, walletCoins: updatedUser.coins || 0, alreadyCreated: false };
+    return {
+      order,
+      coinsEarned: checkout.coinsEarned,
+      walletCoins: updatedUser?.coins ?? checkout.user?.coins ?? 0,
+      alreadyCreated: false,
+    };
   } catch (error) {
     if (walletUpdated) {
-      await User.findByIdAndUpdate(userId, { $inc: { coins: -walletDelta } }).catch((rollbackError) => {
+      await User.findByIdAndUpdate(userId, { $inc: { coins: checkout.coinsUsed } }).catch((rollbackError) => {
         console.error("Wallet rollback failed:", rollbackError.message);
       });
     }

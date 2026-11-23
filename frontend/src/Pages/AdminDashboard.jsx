@@ -13,6 +13,7 @@ const TABS = [
   { id: "orders", label: "Orders", icon: "▤" },
   { id: "customers", label: "Customers", icon: "♙" },
   { id: "reviews", label: "Reviews", icon: "★" },
+  { id: "settings", label: "Settings", icon: "⚙" },
 ];
 
 const money = (amount) => `₹${Number(amount || 0).toLocaleString("en-IN")}`;
@@ -27,6 +28,7 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [coinRewardPercentage, setCoinRewardPercentage] = useState("5");
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -59,18 +61,20 @@ export default function AdminDashboard() {
     if (showSpinner) setLoading(true);
     setError("");
     try {
-      const [summaryData, productData, orderData, customerData, reviewData] = await Promise.all([
+      const [summaryData, productData, orderData, customerData, reviewData, settingsData] = await Promise.all([
         request("/api/admin/summary"),
         request("/api/admin/products"),
         request("/api/admin/orders"),
         request("/api/admin/customers"),
         request("/api/admin/reviews"),
+        request("/api/admin/settings/coin-reward"),
       ]);
       setSummary(summaryData);
       setProducts(Array.isArray(productData) ? productData : []);
       setOrders(Array.isArray(orderData) ? orderData : []);
       setCustomers(Array.isArray(customerData) ? customerData : []);
       setReviews(Array.isArray(reviewData) ? reviewData : []);
+      setCoinRewardPercentage(String(settingsData.coinRewardPercentage ?? 5));
     } catch (err) {
       setError(err.message || "Dashboard load nahi ho paya.");
     } finally {
@@ -174,6 +178,52 @@ export default function AdminDashboard() {
     }
   };
 
+  const updateExpectedDeliveryDate = async (orderId, expectedDeliveryDate) => {
+    if (!expectedDeliveryDate) {
+      setError("Expected delivery date select karein.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const result = await request(`/api/admin/orders/${encodeURIComponent(orderId)}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ expectedDeliveryDate }),
+      });
+      setNotice(result.message || "Expected delivery date updated.");
+      await loadDashboard(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const saveCoinRewardPercentage = async (event) => {
+    event.preventDefault();
+    const percentage = Number(coinRewardPercentage);
+    if (!Number.isFinite(percentage) || percentage < 0 || percentage > 20) {
+      setError("Coin reward percentage 0 se 20 ke beech hona chahiye.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const result = await request("/api/admin/settings/coin-reward", {
+        method: "PATCH",
+        body: JSON.stringify({ coinRewardPercentage: percentage }),
+      });
+      setCoinRewardPercentage(String(result.coinRewardPercentage));
+      setNotice(result.message || "Coin reward setting saved.");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const signOut = () => {
     logout();
     navigate("/Login");
@@ -242,9 +292,9 @@ export default function AdminDashboard() {
               {tab !== "overview" && (
                 <div className="admin-panel admin-data-panel">
                   <div className="admin-panel-heading admin-list-heading">
-                    <div><h2>{TABS.find((t) => t.id === tab)?.label} management</h2><p>{tab === "products" ? `${filtered.products.length} products in catalogue` : tab === "orders" ? `${filtered.orders.length} orders found` : tab === "customers" ? `${filtered.customers.length} customer accounts` : `${filtered.reviews.length} customer reviews`}</p></div>
+                    <div><h2>{TABS.find((t) => t.id === tab)?.label} management</h2><p>{tab === "products" ? `${filtered.products.length} products in catalogue` : tab === "orders" ? `${filtered.orders.length} orders found` : tab === "customers" ? `${filtered.customers.length} customer accounts` : tab === "reviews" ? `${filtered.reviews.length} customer reviews` : "Store reward configuration"}</p></div>
                     <div className="admin-list-actions">
-                      <label className="admin-search"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={`Search ${tab}…`} /></label>
+                      {tab !== "settings" && <label className="admin-search"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={`Search ${tab}…`} /></label>}
                       {tab === "products" && <button className="admin-primary-button" onClick={openNewProduct}>＋ Add product</button>}
                     </div>
                   </div>
@@ -254,7 +304,19 @@ export default function AdminDashboard() {
                       {!filtered.products.length && <EmptyRow columns={7} text="No products found." />}
                     </tbody></table></div>
                   )}
-                  {tab === "orders" && <OrdersTable orders={filtered.orders} busy={busy} onStatusChange={updateOrderStatus} />}
+                  {tab === "orders" && <OrdersTable orders={filtered.orders} busy={busy} onStatusChange={updateOrderStatus} onExpectedDateChange={updateExpectedDeliveryDate} />}
+                  {tab === "settings" && (
+                    <form className="admin-settings-form" onSubmit={saveCoinRewardPercentage}>
+                      <div className="admin-settings-icon">🪙</div>
+                      <div>
+                        <h3>SHIVRAM Coin Reward</h3>
+                        <p>Set the percentage of the payable order amount that customers receive as coins after delivery. This setting applies only to new orders; existing orders keep their saved reward rate.</p>
+                      </div>
+                      <label>Reward percentage (%)<input type="number" min="0" max="20" step="0.5" value={coinRewardPercentage} onChange={(e) => setCoinRewardPercentage(e.target.value)} /></label>
+                      <small>Allowed range: 0%–20%. Default: 5%. 1 SHIVRAM Coin = ₹1.</small>
+                      <button type="submit" className="admin-primary-button" disabled={busy}>{busy ? "Saving…" : "Save reward setting"}</button>
+                    </form>
+                  )}
                   {tab === "customers" && (
                     <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>CUSTOMER</th><th>PHONE</th><th>LOCATION</th><th>COINS</th><th>JOINED</th></tr></thead><tbody>
                       {filtered.customers.map((c) => <tr key={c._id}><td><div className="admin-customer-cell"><span>{(c.name || "C").charAt(0).toUpperCase()}</span><div><strong>{c.name}</strong><small>{c.email}</small></div></div></td><td>{c.phone || "—"}</td><td>{[c.city, c.state].filter(Boolean).join(", ") || "—"}</td><td><span className="admin-coins-pill">🪙 {Number(c.coins || 0)}</span></td><td>{dateLabel(c.createdAt)}</td></tr>)}
@@ -297,11 +359,34 @@ function StatCard({ icon, label, value, note, tone }) {
   return <article className="admin-stat-card"><div className={`admin-stat-icon ${tone}`}>{icon}</div><p>{label}</p><strong>{value}</strong><small>{note}</small><span className={`admin-stat-decoration ${tone}`} /></article>;
 }
 
-function OrdersTable({ orders, busy, onStatusChange, compact = false }) {
+function OrdersTable({ orders, busy, onStatusChange, onExpectedDateChange, compact = false }) {
+  const [dateDrafts, setDateDrafts] = useState({});
+  const dateInputValue = (value) => {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  };
+
   return (
-    <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>ORDER</th><th>CUSTOMER</th><th>DATE</th><th>AMOUNT</th><th>STATUS</th>{!compact && <th>PAYMENT</th>}</tr></thead><tbody>
-      {orders.map((order) => <tr key={order._id || order.orderId}><td><strong className="admin-order-id">{order.orderId || "—"}</strong><small className="admin-subline">{(order.items || []).length} item(s)</small></td><td><strong>{order.userId?.name || order.shippingDetails?.fullName || "Customer"}</strong><small className="admin-subline">{order.userId?.email || order.userId?.phone || ""}</small></td><td>{dateLabel(order.createdAt)}</td><td className="admin-money">{money(order.totalAmount)}</td><td><select aria-label={`Status for ${order.orderId}`} className={`admin-status-select ${String(order.orderStatus || "").toLowerCase().replaceAll(" ", "-")}`} value={order.orderStatus || "Order Placed"} onChange={(e) => onStatusChange(order.orderId, e.target.value)} disabled={busy}><option value={order.orderStatus || "Order Placed"}>{order.orderStatus || "Order Placed"}</option>{ORDER_STATUSES.filter((status) => status !== order.orderStatus).map((status) => <option key={status} value={status}>{status}</option>)}</select></td>{!compact && <td>{order.shippingDetails?.paymentMethod || "—"}</td>}</tr>)}
-      {!orders.length && <EmptyRow columns={compact ? 5 : 6} text="No orders found." />}
+    <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>ORDER</th><th>CUSTOMER</th><th>DATE</th><th>AMOUNT</th><th>STATUS</th>{!compact && <><th>EXPECTED DELIVERY</th><th>REWARD</th><th>PAYMENT</th></>}</tr></thead><tbody>
+      {orders.map((order) => {
+        const fallbackExpectedDate = order.expectedDeliveryDate || (order.createdAt ? new Date(new Date(order.createdAt).getTime() + 5 * 86400000) : null);
+        const dateValue = dateDrafts[order.orderId] ?? dateInputValue(fallbackExpectedDate);
+        return <tr key={order._id || order.orderId}>
+          <td><strong className="admin-order-id">{order.orderId || "—"}</strong><small className="admin-subline">{(order.items || []).length} item(s)</small></td>
+          <td><strong>{order.userId?.name || order.shippingDetails?.fullName || "Customer"}</strong><small className="admin-subline">{order.userId?.email || order.userId?.phone || ""}</small></td>
+          <td>{dateLabel(order.createdAt)}</td>
+          <td className="admin-money">{money(order.totalAmount)}</td>
+          <td><select aria-label={`Status for ${order.orderId}`} className={`admin-status-select ${String(order.orderStatus || "").toLowerCase().replaceAll(" ", "-")}`} value={order.orderStatus || "Order Placed"} onChange={(e) => onStatusChange(order.orderId, e.target.value)} disabled={busy}><option value={order.orderStatus || "Order Placed"}>{order.orderStatus || "Order Placed"}</option>{ORDER_STATUSES.filter((status) => status !== order.orderStatus).map((status) => <option key={status} value={status}>{status}</option>)}</select></td>
+          {!compact && <>
+            <td><div className="admin-date-editor"><input type="date" aria-label={`Expected delivery for ${order.orderId}`} value={dateValue} onChange={(e) => setDateDrafts((old) => ({ ...old, [order.orderId]: e.target.value }))} /><button type="button" onClick={() => onExpectedDateChange(order.orderId, dateValue)} disabled={busy || !dateValue || dateValue === dateInputValue(fallbackExpectedDate)}>Save</button></div></td>
+            <td><span className="admin-coins-pill">🪙 {Number(order.coinsEarned || 0)}</span><small className="admin-subline">{order.coinsCredited ? "Credited" : order.orderStatus === "Cancelled" ? "Cancelled" : "Pending delivery"}</small></td>
+            <td>{order.shippingDetails?.paymentMethod || "—"}</td>
+          </>}
+        </tr>;
+      })}
+      {!orders.length && <EmptyRow columns={compact ? 5 : 8} text="No orders found." />}
     </tbody></table></div>
   );
 }

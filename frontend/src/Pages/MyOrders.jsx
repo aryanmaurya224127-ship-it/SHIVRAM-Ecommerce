@@ -14,6 +14,8 @@ const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000";
 
+const ORDER_STEPS = ["Order Placed", "Processing", "Shipped", "Out for Delivery", "Delivered"];
+
 
 // =====================================================
 // MY ORDERS
@@ -46,108 +48,59 @@ const MyOrders = () => {
   // ===================================================
 
   useEffect(() => {
+    let active = true;
 
-    const fetchOrders = async () => {
-
-      // -----------------------------------------------
-      // LOGIN CHECK
-      // -----------------------------------------------
-
+    const fetchOrders = async (initialLoad = false) => {
       if (!isLoggedIn || !userId) {
-
-        setLoading(false);
-
-        setError("Please login to see your orders.");
-
+        if (active) {
+          setLoading(false);
+          setError("Please login to see your orders.");
+        }
         return;
       }
 
-
       try {
-
-        setLoading(true);
-
-        setError("");
-
-
-        // ---------------------------------------------
-        // API REQUEST
-        // ---------------------------------------------
-
-        const response = await fetch(
-          `${API_BASE_URL}/api/orders/user/${userId}`,
-          {
-            method: "GET",
-
-            headers: {
-              "Content-Type": "application/json",
-
-              ...(token
-                ? {
-                    Authorization: `Bearer ${token}`,
-                  }
-                : {}),
-            },
-          }
-        );
-
-
-        // ---------------------------------------------
-        // RESPONSE
-        // ---------------------------------------------
-
+        if (initialLoad && active) setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/api/orders/user/${userId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
         const data = await response.json();
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            data?.message ||
-            "Orders fetch nahi ho paye."
-          );
-
+        if (!response.ok) throw new Error(data?.message || "Orders fetch nahi ho paye.");
+        if (active) {
+          setOrders(Array.isArray(data) ? data : []);
+          setError("");
         }
-
-
-        // ---------------------------------------------
-        // SAVE ORDERS
-        // ---------------------------------------------
-
-        setOrders(
-          Array.isArray(data)
-            ? data
-            : []
-        );
-
-      } catch (error) {
-
-        console.error(
-          "My Orders Error:",
-          error
-        );
-
-        setError(
-          error.message ||
-          "Orders load nahi ho paye."
-        );
-
+      } catch (fetchError) {
+        console.error("My Orders Error:", fetchError);
+        if (active && initialLoad) setError(fetchError.message || "Orders load nahi ho paye.");
       } finally {
-
-        setLoading(false);
-
+        if (active && initialLoad) setLoading(false);
       }
-
     };
 
-
-    fetchOrders();
-
+    fetchOrders(true);
+    const refreshId = window.setInterval(() => fetchOrders(false), 15000);
+    return () => {
+      active = false;
+      window.clearInterval(refreshId);
+    };
   }, [isLoggedIn, userId, token]);
 
 
   // ===================================================
   // FORMAT DATE
   // ===================================================
+  const expectedDeliveryFor = (order) => {
+    if (order.expectedDeliveryDate) return order.expectedDeliveryDate;
+    if (!order.createdAt) return null;
+    const fallback = new Date(order.createdAt);
+    fallback.setDate(fallback.getDate() + 5);
+    return fallback;
+  };
 
   const formatDate = (date) => {
 
@@ -651,6 +604,43 @@ const MyOrders = () => {
 
                 </div>
 
+
+                <div className="card-body border-bottom bg-light">
+                  <div className="row g-3 align-items-center">
+                    <div className="col-md-5">
+                      <small className="text-muted d-block">Expected delivery</small>
+                      <strong>{formatDate(expectedDeliveryFor(order))}</strong>
+                    </div>
+                    <div className="col-md-7">
+                      <small className="text-muted d-block">SHIVRAM Coin reward</small>
+                      {order.orderStatus === "Cancelled" ? (
+                        <strong className="text-danger">No coins for cancelled orders</strong>
+                      ) : order.coinsCredited ? (
+                        <strong className="text-success">🪙 {Number(order.coinsEarned || 0)} coins credited to your wallet</strong>
+                      ) : Number.isFinite(Number(order.coinRewardPercentage)) ? (
+                        <strong className="text-warning-emphasis">🪙 {Number(order.coinsEarned || 0)} coins pending — credited after delivery</strong>
+                      ) : (
+                        <strong className="text-muted">No pending reward information for this order</strong>
+                      )}
+                    </div>
+                  </div>
+                  {order.orderStatus === "Cancelled" ? (
+                    <div className="mt-3 small text-danger fw-semibold">This order was cancelled.</div>
+                  ) : (
+                    <div className="d-flex flex-wrap gap-2 mt-3">
+                      {ORDER_STEPS.map((step, stepIndex) => {
+                        const currentIndex = ORDER_STEPS.indexOf(order.orderStatus || "Order Placed");
+                        const completed = currentIndex >= stepIndex;
+                        return (
+                          <div key={step} className="small rounded-pill px-3 py-2 border"
+                            style={{ background: completed ? "#e8f7ef" : "#fff", color: completed ? "#18794e" : "#77808e", borderColor: completed ? "#b8e4cc" : "#dee2e6" }}>
+                            {completed ? "✓ " : ""}{step}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
 
                 {/* ==================================
                     ORDER BODY
