@@ -1,20 +1,44 @@
-import Body from "./Component/Body.jsx";
-import { CartProvider } from "./context/CartContext";
-import { ProductProvider } from "./context/ProductContext";
-import { AuthProvider } from "./context/AuthContext";
 
-function App() {
+import { createContext, useContext, useEffect, useState } from "react";
+
+const ProductContext = createContext();
+
+const API_URL = `${import.meta.env.VITE_API_URL}/api/products`;
+
+export function ProductProvider({ children }) {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+          throw new Error(`Products load failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        setProducts(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Products load error:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
   return (
-    <AuthProvider>
-      <CartProvider>
-        <ProductProvider>
-
-          <Body />
-
-        </ProductProvider>
-      </CartProvider>
-    </AuthProvider>
+    <ProductContext.Provider value={{ products, loading }}>
+      {children}
+    </ProductContext.Provider>
   );
 }
 
-export default App;
+export function useProducts() {
+  return useContext(ProductContext);
+}
