@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import MainLayout from "../Layout/MainLayout.jsx";
-import "../Style/login.css";
+import "../Style/Login.css";
 
 function Register() {
   const navigate = useNavigate();
