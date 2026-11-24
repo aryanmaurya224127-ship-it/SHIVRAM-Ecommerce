@@ -72,7 +72,7 @@ function ForgotPassword() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/forgot-password",
+        "https://shivram-backend.onrender.com/api/forgot-password",
         {
           method: "POST",
           headers: {

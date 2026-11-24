@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import MainLayout from "../Layout/MainLayout.jsx";
-import "../Style/Login.css";
+import "../Style/login.css";
 
 function Register() {
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ function Register() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/register",
+        "https://shivram-backend.onrender.com/api/register",
         {
           method: "POST",
           headers: {

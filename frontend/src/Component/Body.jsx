@@ -13,7 +13,7 @@ import Cart from "../Pages/Cart.jsx";
 import Search from "../Pages/Search.jsx";
 import ProductDetail from "../Pages/ProductDetail.jsx";
 import Register from "../Pages/Register.jsx";
-import ForgotPassword  from "../Pages/ForgoyPassword.jsx";
+import ForgotPassword  from "../Pages/ForgotPassword.jsx";
 import OrderPage from '../Pages/OrderPage.jsx';
 import MyOrders from '../Pages/MyOrders.jsx';
 import AdminDashboard from "../Pages/AdminDashboard.jsx";

@@ -16,7 +16,7 @@ const CartContext = createContext(null);
 
 const API_URL = `${
   import.meta.env.VITE_API_URL ||
-  "http://localhost:5000"
+  "https://shivram-backend.onrender.com"
 }/api/cart`;
 
 

@@ -6,7 +6,7 @@ import MainLayout from "../Layout/MainLayout.jsx";
 import "../Style/OrderTrack.css";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000";
+  import.meta.env.VITE_API_URL || "https://shivram-backend.onrender.com";
 
 const DELIVERY_STEPS = [
   "Order Placed",
@@ -24,37 +24,12 @@ const formatPrice = (price) =>
 const formatDate = (date) => {
   if (!date) return "Date unavailable";
 
-  const parsedDate = new Date(date);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return "Date unavailable";
-  }
-
-  return parsedDate.toLocaleString("en-IN", {
+  return new Date(date).toLocaleString("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  });
-};
-
-// Expected delivery is stored by the backend.
-// UTC formatting avoids shifting the saved calendar date.
-const formatExpectedDate = (date) => {
-  if (!date) return "Not available";
-
-  const parsedDate = new Date(date);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return "Not available";
-  }
-
-  return parsedDate.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
   });
 };
 
@@ -169,18 +144,14 @@ const OrderTrack = () => {
       <div className="ot-tracker">
         <div className="ot-tracker-heading">
           <h4>Delivery Progress</h4>
-          <span className="ot-current-status">
-            {status || "Order Placed"}
-          </span>
+          <span className="ot-current-status">{status || "Order Placed"}</span>
         </div>
 
         <div className="ot-timeline">
           {DELIVERY_STEPS.map((step, index) => {
             const completed = index < activeIndex;
             const current = index === activeIndex;
-            const isDone =
-              completed ||
-              (status === "Delivered" && index === 4);
+            const isDone = completed || (status === "Delivered" && index === 4);
 
             return (
               <div
@@ -209,87 +180,6 @@ const OrderTrack = () => {
     );
   };
 
-  // Expected delivery and coins information for each order.
-  const renderOrderRewards = (order, status) => {
-    const isCancelled = status === "Cancelled";
-    const isDelivered = status === "Delivered";
-
-    const expectedDate = order.expectedDeliveryDate;
-
-    // Supports the existing coinsEarned field and a possible
-    // coinRewardAmount field if that is what the backend returns.
-    const coinsEarned = Number(
-      order.coinsEarned ?? order.coinRewardAmount ?? 0
-    );
-
-    const coinsCredited = order.coinsCredited === true;
-
-    let coinStatus = "Pending";
-    let coinMessage = "Coins will be credited after delivery.";
-
-    if (isCancelled) {
-      coinStatus = "Not Eligible";
-      coinMessage = "Cancelled orders do not earn SHIVRAM Coins.";
-    } else if (coinsEarned <= 0) {
-      coinStatus = "No Coins";
-      coinMessage = "No reward coins are available for this order.";
-    } else if (coinsCredited) {
-      coinStatus = "Credited";
-      coinMessage = "Coins have been added to your SHIVRAM wallet.";
-    } else if (isDelivered) {
-      coinStatus = "Awaiting Credit";
-      coinMessage =
-        "Your order is delivered. Wallet credit is awaiting confirmation.";
-    }
-
-    return (
-      <div className="ot-reward-grid">
-        <div className="ot-delivery-date-box">
-          <div className="ot-info-icon">🚚</div>
-          <div className="ot-info-content">
-            <span className="ot-info-label">
-              EXPECTED DELIVERY
-            </span>
-            <strong>
-              {formatExpectedDate(expectedDate)}
-            </strong>
-            <small>
-              {isCancelled
-                ? "This order was cancelled."
-                : isDelivered
-                ? "Your order has been delivered."
-                : "Estimated delivery date"}
-            </small>
-          </div>
-        </div>
-
-        <div
-          className={`ot-coins-box ${
-            coinsCredited && !isCancelled
-              ? "credited"
-              : isCancelled
-              ? "not-eligible"
-              : "pending"
-          }`}
-        >
-          <div className="ot-info-icon">🪙</div>
-          <div className="ot-info-content">
-            <span className="ot-info-label">
-              SHIVRAM COINS
-            </span>
-            <strong>
-              {coinsEarned.toLocaleString("en-IN")} Coins
-            </strong>
-            <span className="ot-coin-status">
-              {coinStatus}
-            </span>
-            <small>{coinMessage}</small>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   if (!isLoggedIn) {
     return null;
   }
@@ -301,7 +191,7 @@ const OrderTrack = () => {
           <div className="ot-page-header">
             <div>
               <p className="ot-eyebrow">SHIVRAM E-COMMERCE</p>
-              <h1> Tracking My Orders</h1>
+              <h1>My Orders</h1>
               <p className="ot-subtitle">
                 Track your orders and check their delivery progress.
               </p>
@@ -312,9 +202,7 @@ const OrderTrack = () => {
               onClick={handleRefresh}
               disabled={refreshing}
             >
-              <span className={refreshing ? "ot-spinning" : ""}>
-                ↻
-              </span>
+              <span className={refreshing ? "ot-spinning" : ""}>↻</span>
               {refreshing ? "Refreshing..." : "Refresh"}
             </button>
           </div>
@@ -363,9 +251,7 @@ const OrderTrack = () => {
 
               <div className="ot-orders-list">
                 {orders.map((order) => {
-                  const status =
-                    order.orderStatus || "Order Placed";
-
+                  const status = order.orderStatus || "Order Placed";
                   const isCancelled = status === "Cancelled";
                   const isDelivered = status === "Delivered";
 
@@ -395,8 +281,6 @@ const OrderTrack = () => {
                           {status}
                         </span>
                       </div>
-
-                      {renderOrderRewards(order, status)}
 
                       {renderDeliveryTracker(status)}
 

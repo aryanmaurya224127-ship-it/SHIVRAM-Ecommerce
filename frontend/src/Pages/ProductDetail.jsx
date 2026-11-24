@@ -6,7 +6,7 @@ import { useCart } from "../context/CartContext.jsx";
 import "../Style/ProductCheckout.css";
 import "../Style/ProductDetailSimple.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://shivram-backend.onrender.com";
 
 function ProductDetail() {
   const { productId } = useParams();

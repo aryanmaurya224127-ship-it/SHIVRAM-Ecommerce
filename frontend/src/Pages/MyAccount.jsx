@@ -17,7 +17,7 @@ export default function MyAccount() {
   const [reviewMessage, setReviewMessage] = useState("");
   const [reviewError, setReviewError] = useState("");
   const userId = user?._id || user?.id;
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "https://shivram-backend.onrender.com";
 
   const refreshWallet = useCallback(async () => {
     if (!userId) return;

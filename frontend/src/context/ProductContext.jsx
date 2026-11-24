@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const ProductContext = createContext();
 
-const API_URL = "http://localhost:5000/api/products";
+const API_URL = "https://shivram-backend.onrender.com/api/products";
 
 export function ProductProvider({ children }) {
 
