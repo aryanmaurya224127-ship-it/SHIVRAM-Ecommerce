@@ -18,8 +18,7 @@ function Search() {
     <MainLayout>
       <div className="container mt-4">
 
-        {/* Search Heading */}
-         {searchText && ( <h3 className="mb-4"> Search Results for: "{query}" </h3> )}
+      
 
         {/* Loading */}
         {loading ? (
