@@ -9,7 +9,7 @@ function CasualShoesPage() {
   const { products, loading } = useProducts();
 
   const casualShoes = products.filter(
-    (product) => product.productId >= 1 && product.productId <= 12
+  (product) => product.Category.toLowerCase() === "casual shoes"
   );
 
   if (loading) {

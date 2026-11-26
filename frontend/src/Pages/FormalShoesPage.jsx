@@ -9,7 +9,7 @@ function FormalShoesPage() {
   const { products, loading } = useProducts();
 
   const formalShoes = products.filter(
-    (product) => product.productId >= 13 && product.productId <= 24
+  (product) => product.Category.toLowerCase() ==="formal shoes"
   );
 
   if (loading) {

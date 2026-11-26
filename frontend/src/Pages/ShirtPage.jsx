@@ -10,7 +10,7 @@ function ShirtPage() {
   const { products, loading } = useProducts();
 
   const shirt = products.filter(
-    (product) => product.Category === "shirt"
+    (product) => product.Category.toLowerCase() === "shirt"
   );
 
   if (loading) {

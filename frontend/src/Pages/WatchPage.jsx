@@ -9,9 +9,10 @@ function WatchPage() {
 
   const { products, loading } = useProducts();
 
-  const watch = products.filter(
-    (product) => product.Category === "watch"
-  );
+
+const watch = products.filter(
+    (product) => product.Category.toLowerCase() === "watch"
+);
 
   if (loading) {
     return <h3 className="text-center mt-5">Loading products...</h3>;

@@ -83,7 +83,7 @@ function Products({ products }) {
             <p className="old-price">₹{product.Price}</p>
 
             <h3 className="new-price">
-              ₹{finalPrice}
+              ₹{finalPrice.toFixed(2)}
             </h3>
 
             <p className="rating">

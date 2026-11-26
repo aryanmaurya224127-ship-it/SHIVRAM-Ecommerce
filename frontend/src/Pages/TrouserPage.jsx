@@ -9,7 +9,7 @@ function TrouserPage() {
   const { products, loading } = useProducts();
 
   const trouser = products.filter(
-    (product) => product.Category === "trouser"
+    (product) => product.Category.toLowerCase() === "trouser"
   );
 
   if (loading) {
