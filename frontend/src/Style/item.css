@@ -1,36 +1,46 @@
 
-
-
 /* =========================================
    SHIVRAM - PRODUCTS / CATEGORY PAGE
    ========================================= */
 
-/* Main Product Container */
+* {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   MAIN PRODUCT CONTAINER
+   ========================================= */
+
 .products-container {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  align-items: stretch;
   gap: 24px;
   padding: 20px 0;
 }
-
-
 
 /* =========================================
    PRODUCT CARD
    ========================================= */
 
 .product-card {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+
   background: #ffffff;
   border: 1px solid #e1e5ea;
   border-radius: 12px;
+
   padding: 16px;
   overflow: hidden;
-  transition: all 0.3s ease;
-  height: 100%;
 
   display: flex;
   flex-direction: column;
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .product-card:hover {
@@ -38,77 +48,29 @@
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
 }
 
-
 /* =========================================
-   CATEGORY PAGE CONTENT - PREMIUM GRADIENT
-   ========================================= */
+   ITEM CONTENT / CATEGORY BANNER
+========================================= */
 
 .ItemContent {
-  position: relative;
-  overflow: hidden;
-
+  width: 100%;
+  background: linear-gradient(135deg, #172554, #1d4ed8, #312e81);
+  color: white;
   text-align: center;
-  padding: 38px 25px;
-  margin: 20px 0 30px;
-
-  background: linear-gradient(
-    135deg,
-    #172554 0%,
-    #1d4ed8 55%,
-    #312e81 100%
-  );
-
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-
-  box-shadow: 0 8px 24px rgba(23, 37, 84, 0.18);
-
-  transition: box-shadow 0.3s ease;
+  padding: 18px 18px;
+  margin: 0 0 10px !important;
 }
 
-.ItemContent:hover {
-  box-shadow: 0 12px 30px rgba(29, 78, 216, 0.25);
-}
-
-.ItemContent h2 {
-  margin-bottom: 14px;
-
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: 0.4px;
-
-  color: #ffffff;
+.ItemContent h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 .ItemContent p {
-  max-width: 800px;
-  margin: 0 auto;
-
-  color: #e0e7ff;
-
   font-size: 16px;
-  line-height: 1.8;
+  margin-bottom: 0;
 }
-
-/* MOBILE RESPONSIVE */
-
-@media (max-width: 576px) {
-  .ItemContent {
-    padding: 28px 18px;
-    margin: 15px 0 22px;
-    border-radius: 14px;
-  }
-
-  .ItemContent h2 {
-    font-size: 23px;
-  }
-
-  .ItemContent p {
-    font-size: 14px;
-    line-height: 1.7;
-  }
-}
-
 
 /* =========================================
    PRODUCT IMAGE
@@ -117,6 +79,10 @@
 .image-box {
   width: 100%;
   height: 270px;
+  min-height: 270px;
+
+  flex-shrink: 0;
+
   position: relative;
 
   display: flex;
@@ -128,9 +94,21 @@
   overflow: hidden;
 }
 
+.product-link-button {
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
 .product-image {
   width: 100%;
   height: 100%;
+
   object-fit: contain;
   padding: 10px;
 
@@ -140,7 +118,6 @@
 .product-card:hover .product-image {
   transform: scale(1.05);
 }
-
 
 /* =========================================
    OFFER BADGE
@@ -152,15 +129,16 @@
   left: 10px;
 
   background: #198754;
-  color: white;
+  color: #ffffff;
 
   padding: 5px 9px;
   border-radius: 5px;
 
   font-size: 12px;
   font-weight: 700;
-}
 
+  z-index: 2;
+}
 
 /* =========================================
    PRODUCT TITLE
@@ -176,7 +154,6 @@
   font-weight: 600;
 }
 
-
 /* =========================================
    PRODUCT DESCRIPTION
    ========================================= */
@@ -189,9 +166,16 @@
   line-height: 1.5;
 }
 
+/* =========================================
+   DESCRIPTION SPACE
+   ========================================= */
+
+.product-card > p:not(.old-price):not(.rating):not(.delivery) {
+  min-height: 63px;
+}
 
 /* =========================================
-   PRICE
+   OLD PRICE
    ========================================= */
 
 .old-price {
@@ -203,6 +187,10 @@
   margin-bottom: 2px !important;
 }
 
+/* =========================================
+   FINAL PRICE
+   ========================================= */
+
 .new-price {
   color: #0b3d91 !important;
 
@@ -211,7 +199,6 @@
 
   margin: 0 0 8px !important;
 }
-
 
 /* =========================================
    RATING
@@ -226,7 +213,6 @@
   margin-bottom: 6px !important;
 }
 
-
 /* =========================================
    DELIVERY
    ========================================= */
@@ -240,7 +226,6 @@
   margin-bottom: 14px !important;
 }
 
-
 /* =========================================
    ADD TO CART BUTTON
    ========================================= */
@@ -249,6 +234,8 @@
   width: 100%;
 
   margin-top: auto;
+
+  flex-shrink: 0;
 
   border: none;
   border-radius: 7px;
@@ -261,42 +248,18 @@
   transition: all 0.25s ease;
 }
 
+
 .product-card .btn-warning:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-
-/* =========================================
-   CATEGORY PAGE CONTENT
-   ========================================= */
-
-.ItemContent {
-  text-align: center;
-
-  padding: 25px 10px 10px;
+.product-card .btn-warning:focus,
+.product-card .btn-warning:active {
+  border: 2px solid #cfe8ff !important;
+  box-shadow: 0 0 10px rgba(173, 216, 255, 0.7) !important;
+  outline: none;
 }
-
-.ItemContent h2 {
-  margin-bottom: 10px;
-
-  font-size: 30px;
-  font-weight: 700;
-
-  color: #212529;
-}
-
-.ItemContent p {
-  max-width: 800px;
-
-  margin: 0 auto;
-
-  color: #6c757d;
-
-  font-size: 16px;
-  line-height: 1.6;
-}
-
 
 /* =========================================
    RESPONSIVE - LAPTOP
@@ -305,16 +268,16 @@
 @media (max-width: 1200px) {
 
   .products-container {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
   }
 
   .image-box {
     height: 250px;
+    min-height: 250px;
   }
 
 }
-
 
 /* =========================================
    RESPONSIVE - TABLET
@@ -323,12 +286,13 @@
 @media (max-width: 900px) {
 
   .products-container {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
   }
 
   .image-box {
     height: 240px;
+    min-height: 240px;
   }
 
   .ItemContent h2 {
@@ -336,7 +300,6 @@
   }
 
 }
-
 
 /* =========================================
    RESPONSIVE - MOBILE
@@ -346,17 +309,20 @@
 
   .products-container {
     grid-template-columns: 1fr;
-    gap: 18px;
+    grid-auto-rows: auto;
 
+    gap: 18px;
     padding: 15px 10px;
   }
 
   .product-card {
     padding: 14px;
+    height: auto;
   }
 
   .image-box {
     height: 280px;
+    min-height: 280px;
   }
 
   .product-card h3 {
@@ -368,7 +334,8 @@
   }
 
   .ItemContent {
-    padding: 20px 10px 5px;
+    padding: 28px 18px;
+    margin: 15px 0 22px;
   }
 
   .ItemContent h2 {
@@ -377,10 +344,10 @@
 
   .ItemContent p {
     font-size: 14px;
+    line-height: 1.7;
   }
 
 }
-
 
 /* =========================================
    VERY SMALL MOBILE
@@ -390,6 +357,7 @@
 
   .image-box {
     height: 250px;
+    min-height: 250px;
   }
 
   .product-card {
@@ -401,4 +369,6 @@
     padding: 4px 7px;
   }
 
+
 }
+

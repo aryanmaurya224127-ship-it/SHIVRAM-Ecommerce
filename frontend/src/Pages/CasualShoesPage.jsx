@@ -1,5 +1,7 @@
 import Products from '../Component/Products.jsx';
-import MainLayout from '../Layout/MainLayout.jsx';
+
+import Navbar from "../Layout/Navbar.jsx";
+import Footer from "../Layout/Footer.jsx";
 import { useProducts } from '../context/ProductContext.jsx';
 
 import '../Style/item.css';
@@ -9,7 +11,7 @@ function CasualShoesPage() {
   const { products, loading } = useProducts();
 
   const casualShoes = products.filter(
-  (product) => product.Category.toLowerCase() === "casual shoes"
+    (product) => product.Category?.toLowerCase() === "casual shoes"
   );
 
   if (loading) {
@@ -17,25 +19,27 @@ function CasualShoesPage() {
   }
 
   return (
-    <MainLayout>
-      <section className='body-section'>
-        <div className='container'>
+    <>
+      <Navbar />
 
-          <div className="ItemContent">
-            <h2>Men's Casual Shoes Collection</h2>
-            <p>
-              Discover SHIVRAM's premium casual shoes designed for everyday
-              comfort, modern style, and long-lasting durability.
-            </p>
-          </div>
+      <div className="ItemContent">
+        <h2>Men's Casual Shoes Collection</h2>
+        <p>
+          Discover SHIVRAM's premium casual shoes designed for everyday
+          comfort, modern style, and long-lasting durability.
+        </p>
+      </div>
 
+      <section className="body-section">
+        <div className="container">
           <div className="row">
             <Products products={casualShoes} />
           </div>
-
         </div>
       </section>
-    </MainLayout>
+
+      <Footer />
+    </>
   );
 }
 

@@ -21,13 +21,10 @@
 .navbar-top {
   width: 100%;
   min-height: 75px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   padding: 12px 30px;
-
   gap: 25px;
 }
 
@@ -41,12 +38,9 @@
 
 .Logo {
   text-decoration: none;
-
   font-size: 30px;
   font-weight: 700;
-
   color: blue;
-
   letter-spacing: 1px;
 }
 
@@ -65,32 +59,21 @@
 .search-form {
   display: flex;
   align-items: center;
-
   width: 100%;
   max-width: 550px;
-
   margin: 0 auto;
-
   position: relative;
 }
 
 .search-form input {
   width: 100%;
-
   height: 42px;
-
   padding: 0 50px 0 15px;
-
   border: 1px solid #555;
-
   border-radius: 8px;
-
   outline: none;
-
   background: #343a40;
-
   color: white;
-
   font-size: 14px;
 }
 
@@ -100,32 +83,20 @@
 
 .search-form input:focus {
   border-color: #0d6efd;
-
-  box-shadow:
-    0 0 0 2px rgba(13, 110, 253, 0.25);
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
 }
-
-/* SEARCH BUTTON */
 
 .search-form button {
   position: absolute;
-
   right: 5px;
   top: 4px;
-
   width: 34px;
   height: 34px;
-
   border: none;
-
   border-radius: 6px;
-
   background: transparent;
-
   color: white;
-
   cursor: pointer;
-
   font-size: 16px;
 }
 
@@ -139,11 +110,8 @@
 
 .navbar-actions {
   display: flex;
-
   align-items: center;
-
   gap: 10px;
-
   flex-shrink: 0;
 }
 
@@ -153,25 +121,21 @@
 
 .login-nav-btn {
   border: 1px solid white;
-
   background: transparent;
-
   color: white;
-
   padding: 8px 18px;
-
   border-radius: 6px;
-
   font-size: 15px;
-
   cursor: pointer;
-
   transition: 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login-nav-btn:hover {
   background: white;
-
   color: #212529;
 }
 
@@ -183,43 +147,27 @@
   position: relative;
 }
 
-/* PROFILE CIRCLE */
-
 .profile-circle {
   width: 42px;
   height: 42px;
-
   border-radius: 50%;
-
   border: 2px solid white;
-
   background: #0d6efd;
-
   color: white;
-
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   font-size: 18px;
-
   font-weight: 700;
-
   text-transform: uppercase;
-
   cursor: pointer;
-
   transition: 0.2s ease;
-
   padding: 0;
 }
 
 .profile-circle:hover {
   transform: scale(1.05);
-
-  box-shadow:
-    0 0 0 3px rgba(13, 110, 253, 0.3);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.3);
 }
 
 /* =====================================
@@ -228,41 +176,27 @@
 
 .profile-dropdown {
   position: absolute;
-
   top: 52px;
-
   right: 0;
-
   width: 280px;
-
   background: white;
-
   color: #222;
-
   border-radius: 12px;
-
   padding: 22px;
-
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.3);
-
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
   text-align: center;
-
   animation: profileOpen 0.15s ease;
-
   z-index: 9999;
 }
 
 @keyframes profileOpen {
   from {
     opacity: 0;
-
     transform: translateY(-5px);
   }
 
   to {
     opacity: 1;
-
     transform: translateY(0);
   }
 }
@@ -274,24 +208,15 @@
 .profile-avatar-large {
   width: 65px;
   height: 65px;
-
   margin: 0 auto 12px;
-
   border-radius: 50%;
-
   background: #0d6efd;
-
   color: white;
-
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   font-size: 28px;
-
   font-weight: 700;
-
   text-transform: uppercase;
 }
 
@@ -301,11 +226,8 @@
 
 .profile-dropdown h4 {
   margin: 5px 0;
-
   font-size: 18px;
-
   font-weight: 600;
-
   color: #222;
 }
 
@@ -315,11 +237,8 @@
 
 .profile-email {
   margin: 6px 0;
-
   font-size: 14px;
-
   color: #666;
-
   word-break: break-word;
 }
 
@@ -329,9 +248,7 @@
 
 .profile-phone {
   margin: 6px 0;
-
   font-size: 13px;
-
   color: #777;
 }
 
@@ -341,33 +258,25 @@
 
 .profile-dropdown hr {
   margin: 18px 0;
-
   border: none;
-
   border-top: 1px solid #ddd;
 }
 
-
 /* =====================================
-   PROFILE DROPDOWN BUTTONS
+   PROFILE BUTTONS
 ===================================== */
 
 .profile-dropdown .btn-outline-theme-primary {
   display: block;
   width: 100%;
-
   padding: 9px 12px;
   margin-bottom: 10px;
-
   border: 1px solid #0d6efd;
   border-radius: 6px;
-
   background: #fff;
   color: #0d6efd;
-
   font-size: 14px;
   font-weight: 500;
-
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -383,25 +292,20 @@
 }
 
 /* =====================================
-   LOGOUT BUTTON
+   LOGOUT
 ===================================== */
 
 .profile-dropdown .btn-subtle-theme-danger {
   display: block;
   width: 100%;
-
   padding: 9px 12px;
   margin-bottom: 8px;
-
   border: 1px solid #dc3545;
   border-radius: 6px;
-
   background: #fff;
   color: #dc3545;
-
   font-size: 14px;
   font-weight: 600;
-
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -416,49 +320,42 @@
   outline-offset: 2px;
 }
 
-
 /* =====================================
    CART
 ===================================== */
 
-.cart-link {
-  text-decoration: none;
-}
-
 .cart-btn {
   position: relative;
-
-  display: flex;
-
+  display: inline-flex;
   align-items: center;
-
-  gap: 6px;
+  justify-content: center;
+  gap: 7px;
 
   border: none;
-
   background: #ffc107;
-
   color: #212529;
 
   padding: 9px 15px;
-
   border-radius: 6px;
-
   font-size: 15px;
-
   font-weight: 500;
 
   cursor: pointer;
-
   transition: 0.2s ease;
+
+  text-decoration: none;
+  flex-shrink: 0;
 }
 
 .cart-btn:hover {
   background: #ffca2c;
-
+  color: #212529;
   transform: translateY(-1px);
 }
 
+.cart-btn svg {
+  flex-shrink: 0;
+}
 
 /* =====================================
    CART COUNT BADGE
@@ -466,74 +363,52 @@
 
 .cart-count {
   position: absolute;
-
   top: -9px;
-
   right: -8px;
 
   min-width: 21px;
-
   height: 21px;
-
   padding: 0 5px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   background: #dc3545;
-
   color: white;
 
   border: 2px solid #212529;
-
   border-radius: 50%;
 
   font-size: 11px;
-
   font-weight: 700;
-
   line-height: 1;
 
   z-index: 5;
 }
+
 /* =====================================
    CATEGORY NAVIGATION
 ===================================== */
 
 .icons {
   width: 100%;
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   flex-wrap: wrap;
-
   gap: 28px;
-
   padding: 12px 20px;
-
   background: #343a40;
-
   border-top: 1px solid #444;
 }
 
 .icons a {
   color: white;
-
   text-decoration: none;
-
   font-size: 15px;
-
   font-weight: 500;
-
   transition: 0.2s ease;
-
   padding: 5px 0;
 }
 
@@ -541,11 +416,8 @@
   color: #ffc107;
 }
 
-/* ACTIVE LINK */
-
 .icons a.active {
   color: #ffc107;
-
   font-weight: 600;
 }
 
@@ -557,7 +429,6 @@
 
   .navbar-top {
     padding: 12px 20px;
-
     gap: 15px;
   }
 
@@ -572,7 +443,6 @@
   .icons {
     gap: 20px;
   }
-
 }
 
 /* =====================================
@@ -582,67 +452,113 @@
 @media (max-width: 700px) {
 
   .navbar-top {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
 
-    justify-content: center;
+    min-height: auto;
+    padding: 12px 15px 10px;
 
-    padding: 15px;
+    gap: 10px;
   }
+
+  /* LOGO */
 
   .logo-name {
-    width: 100%;
-
-    text-align: center;
+    width: auto;
+    text-align: left;
   }
+
+  .Logo {
+    font-size: 25px;
+  }
+
+  /* SEARCH */
 
   .search-form {
-    width: 100%;
+    grid-column: 1 / -1;
+    grid-row: 2;
 
+    width: 100%;
     max-width: 100%;
 
-    order: 3;
+    margin: 0;
   }
 
+  /* ACTIONS */
+
   .navbar-actions {
-    position: absolute;
+    position: static;
 
-    top: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 
-    right: 15px;
+    gap: 10px;
   }
 
   .login-nav-btn {
     padding: 7px 12px;
-
     font-size: 14px;
   }
 
-  .cart-btn {
-    padding: 8px 10px;
+  .profile-circle {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
   }
 
-  .cart-btn span {
+  /* CART */
+
+  .cart-btn {
+    padding: 8px 11px;
+    min-height: 38px;
+    min-width: 40px;
+  }
+
+  /* Only hide Cart text, NOT the quantity badge */
+
+  .cart-label {
     display: none;
   }
 
+  .cart-count {
+    display: flex;
+  }
+
+  /* CATEGORY NAVIGATION */
+
   .icons {
-    gap: 15px;
+    display: flex;
+    flex-wrap: nowrap;
 
-    padding: 10px;
+    justify-content: flex-start;
+    gap: 18px;
 
-    justify-content: center;
+    padding: 10px 15px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .icons::-webkit-scrollbar {
+    display: none;
   }
 
   .icons a {
+    flex-shrink: 0;
     font-size: 13px;
   }
 
-  .profile-dropdown {
-    right: -5px;
+  /* PROFILE DROPDOWN */
 
+  .profile-dropdown {
+    right: 0;
     width: 260px;
   }
-
 }
 
 /* =====================================
@@ -651,38 +567,69 @@
 
 @media (max-width: 450px) {
 
-  .Logo {
-    font-size: 25px;
+  .navbar-top {
+    padding: 10px 12px 8px;
+    gap: 8px;
   }
 
-  .navbar-top {
-    min-height: 125px;
+  .Logo {
+    font-size: 24px;
   }
 
   .navbar-actions {
-    top: 14px;
-
-    right: 10px;
+    gap: 8px;
   }
 
   .profile-circle {
-    width: 38px;
-
-    height: 38px;
-
-    font-size: 16px;
+    width: 36px;
+    height: 36px;
   }
 
   .cart-btn {
     padding: 7px 9px;
+    min-width: 38px;
+  }
+
+  .search-form input {
+    height: 40px;
   }
 
   .icons {
-    gap: 10px 15px;
+    gap: 15px;
+    padding: 9px 12px;
   }
 
   .icons a {
     font-size: 12px;
   }
+}
 
+/* =====================================
+   VERY SMALL MOBILE
+===================================== */
+
+@media (max-width: 360px) {
+
+  .navbar-top {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .Logo {
+    font-size: 22px;
+  }
+
+  .navbar-actions {
+    gap: 6px;
+  }
+
+  .profile-circle {
+    width: 34px;
+    height: 34px;
+  }
+
+  .cart-btn {
+    min-width: 36px;
+    padding: 6px 8px;
+  }
 }

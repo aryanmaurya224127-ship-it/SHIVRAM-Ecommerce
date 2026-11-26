@@ -1,5 +1,6 @@
 import Products from '../Component/Products.jsx';
-import MainLayout from "../Layout/MainLayout.jsx";
+import Navbar from "../Layout/Navbar.jsx";
+import Footer from "../Layout/Footer.jsx";
 import { useProducts } from '../context/ProductContext.jsx';
 
 import "../Style/item.css";
@@ -9,7 +10,7 @@ function FormalShoesPage() {
   const { products, loading } = useProducts();
 
   const formalShoes = products.filter(
-  (product) => product.Category.toLowerCase() ==="formal shoes"
+  (product) => product.Category?.toLowerCase() ==="formal shoes"
   );
 
   if (loading) {
@@ -17,19 +18,21 @@ function FormalShoesPage() {
   }
 
   return (
-    <MainLayout>
-      <section className="body-section py-5">
-        <div className="container">
-
-          <div className="ItemContent">
+  <>
+        <Navbar />
+      <div className="ItemContent">
             <h2 className="fw-bold">Men's Formal Shoes Collection</h2>
 
-            <p className="text-muted">
+            <p >
               Step into elegance with SHIVRAM's premium formal shoes.
               Perfect for office wear, business meetings, weddings,
               and every special occasion.
             </p>
           </div>
+      <section className="body-section py-5">
+        <div className="container">
+
+          
 
           <div className="row g-4">
             <Products products={formalShoes} />
@@ -37,8 +40,11 @@ function FormalShoesPage() {
 
         </div>
       </section>
-    </MainLayout>
+         <Footer />
+           </>
+
   );
+
 }
 
 export default FormalShoesPage;

@@ -1,5 +1,6 @@
 import Products from '../Component/Products.jsx';
-import MainLayout from '../Layout/MainLayout.jsx';
+import Navbar from "../Layout/Navbar.jsx";
+import Footer from "../Layout/Footer.jsx";
 import { useProducts } from '../context/ProductContext.jsx';
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -10,7 +11,7 @@ function ShirtPage() {
   const { products, loading } = useProducts();
 
   const shirt = products.filter(
-    (product) => product.Category.toLowerCase() === "shirt"
+    (product) => product.Category?.toLowerCase() === "shirt"
   );
 
   if (loading) {
@@ -18,27 +19,29 @@ function ShirtPage() {
   }
 
   return (
-    <MainLayout>
-      <section className='body-section'>
-        <div className='container'>
+    <>
+      <Navbar />
 
-          <div className="ItemContent">
-            <h2>Men's Trouser Collection</h2>
+      <div className="ItemContent">
+        <h2>Men's Shirt Collection</h2>
 
-            <p>
-              Discover SHIVRAM's premium collection of men's trousers.
-              Perfect for office wear, casual outings, and every occasion,
-              offering comfort, durability, and modern style.
-            </p>
-          </div>
+        <p>
+          Discover SHIVRAM's premium collection of men's shirts.
+          Perfect for office wear, casual outings, and every occasion,
+          offering comfort, durability, and modern style.
+        </p>
+      </div>
 
+      <section className="body-section">
+        <div className="container">
           <div className="row">
             <Products products={shirt} />
           </div>
-
         </div>
       </section>
-    </MainLayout>
+
+      <Footer />
+    </>
   );
 }
 

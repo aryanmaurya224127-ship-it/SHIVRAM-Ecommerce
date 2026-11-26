@@ -14,19 +14,21 @@ function HomePage() {
   return (
     <>
       <Navbar />
-
-      <section className="body-section py-5">
-        <div className="container">
-
+      
           <div className="ItemContent">
             <h2 className="fw-bold">Welcome to SHIVRAM</h2>
 
-            <p className="text-muted">
+            <p >
               Discover premium men's fashion with our exclusive collection of
               Shirts, T-Shirts, Trousers, Watches, Casual Shoes, and Formal Shoes.
               Upgrade your style with SHIVRAM.
             </p>
           </div>
+
+      <section className="body-section py-5">
+        <div className="container">
+
+        
 
           <div className="row g-4">
             <Products products={products} />
